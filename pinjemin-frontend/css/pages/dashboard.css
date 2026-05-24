@@ -78,3 +78,38 @@
   font-weight: 700;
   color: var(--color-primary-600);
 }
+
+/* ── Mobile-only Back to Landing Box ───────────────────────── */
+.dashboard-back-landing {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-200);
+  border-radius: var(--radius-xl);
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-700);
+  text-decoration: none;
+  width: 100%;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.dashboard-back-landing:hover {
+  background: var(--color-primary-100);
+  border-color: var(--color-primary-300);
+}
+
+@media (max-width: 1023px) {
+  .dashboard-back-landing { display: inline-flex; }
+}
+
+/* ── Responsive Section Labels ──────────────────────────────── */
+.desktop-label { display: inline; }
+.mobile-label  { display: none; }
+
+@media (max-width: 1023px) {
+  .desktop-label { display: none; }
+  .mobile-label  { display: inline; }
+}

@@ -1,5 +1,6 @@
 /* ============================================================
    PINJEMIN — BOTTOM NAV (Mobile Navigation)
+   6 items, no scroll, fills full width
    ============================================================ */
 
 .bottom-nav {
@@ -9,14 +10,16 @@
   left: 0;
   right: 0;
   z-index: var(--z-sticky);
-  background-color: rgba(255,255,255,0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(255,255,255,0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--color-neutral-200);
-  padding: var(--space-2) var(--space-4) env(safe-area-inset-bottom, var(--space-2));
-  height: 72px;
+  padding: var(--space-2) var(--space-1) env(safe-area-inset-bottom, var(--space-2));
+  height: 64px;
   align-items: stretch;
-  justify-content: space-around;
+  justify-content: space-between;
+  /* No scroll */
+  overflow: visible;
 }
 
 @media (max-width: 1023px) {
@@ -29,51 +32,33 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-lg);
+  gap: 2px;
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-md);
   text-decoration: none;
   color: var(--color-neutral-400);
   cursor: pointer;
   transition: color var(--transition-fast), background-color var(--transition-fast);
-  min-width: 52px;
   border: none;
   background: none;
   position: relative;
-  flex: 1;
+  flex: 1;          /* rata membagi ruang */
+  min-width: 0;     /* cegah overflow */
 }
 
 .bottom-nav__item:hover {
   color: var(--color-neutral-700);
-  background-color: var(--color-neutral-100);
 }
 
 .bottom-nav__item.is-active {
   color: var(--color-primary-600);
 }
 
-.bottom-nav__icon {
-  width: 24px;
-  height: 24px;
-  position: relative;
-}
-
-.bottom-nav__icon svg {
-  width: 24px;
-  height: 24px;
-}
-
-.bottom-nav__label {
-  font-size: 0.65rem;
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.01em;
-}
-
-/* ── Active Indicator ────────────────────────────────────── */
+/* Active dot indicator */
 .bottom-nav__item.is-active .bottom-nav__icon::after {
   content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: -3px;
   left: 50%;
   transform: translateX(-50%);
   width: 4px;
@@ -82,49 +67,47 @@
   background-color: var(--color-primary-500);
 }
 
-/* ── FAB (Center Add Button) ─────────────────────────────── */
-.bottom-nav__fab {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-600));
-  color: white;
+/* ── Icon ────────────────────────────────────────────────── */
+.bottom-nav__icon {
+  width: 22px;
+  height: 22px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-glow-orange), var(--shadow-lg);
-  cursor: pointer;
-  border: none;
-  transition: transform var(--transition-spring), box-shadow var(--transition-fast);
-  align-self: center;
-  margin-bottom: 12px;
   flex-shrink: 0;
-  flex: 0 0 52px;
 }
 
-.bottom-nav__fab:hover {
-  transform: scale(1.1) translateY(-2px);
+.bottom-nav__icon svg {
+  width: 22px;
+  height: 22px;
 }
 
-.bottom-nav__fab:active {
-  transform: scale(0.95);
-}
-
-.bottom-nav__fab svg {
-  width: 24px;
-  height: 24px;
+/* ── Label ───────────────────────────────────────────────── */
+.bottom-nav__label {
+  font-size: 0.5rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  max-width: 100%;
+  text-align: center;
+  line-height: 1.2;
 }
 
 /* ── Notification Badge ──────────────────────────────────── */
 .bottom-nav__badge {
   position: absolute;
-  top: 4px;
-  right: 8px;
-  min-width: 16px;
-  height: 16px;
+  top: -3px;
+  right: -5px;
+  min-width: 14px;
+  height: 14px;
   background-color: var(--color-accent-500);
   color: white;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 700;
   border-radius: var(--radius-full);
   display: flex;

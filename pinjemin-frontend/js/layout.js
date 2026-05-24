@@ -62,30 +62,19 @@ export function renderAppShell(activePage = '') {
   </aside>
   <div class="sidebar-overlay" id="sidebar-overlay"></div>`;
 
+  const bottomNavLinks = navLinks.filter(l => l.id !== 'borrows-active' && l.id !== 'notifications');
+
   const bottomNavHtml = `
   <nav class="bottom-nav" id="bottom-nav">
-    <a href="dashboard.html" class="bottom-nav__item ${activePage==='dashboard'?'is-active':''}">
-      <span class="bottom-nav__icon"><i data-lucide="home" style="width:24px;height:24px"></i></span>
-      <span class="bottom-nav__label">Beranda</span>
-    </a>
-    <a href="discover.html" class="bottom-nav__item ${activePage==='discover'?'is-active':''}">
-      <span class="bottom-nav__icon"><i data-lucide="search" style="width:24px;height:24px"></i></span>
-      <span class="bottom-nav__label">Temukan</span>
-    </a>
-    <a href="item-new.html" class="bottom-nav__fab" aria-label="Tambah Barang">
-      <i data-lucide="plus" style="width:24px;height:24px"></i>
-    </a>
-    <a href="requests.html" class="bottom-nav__item ${activePage==='requests'?'is-active':''}">
+    ${bottomNavLinks.map(link => `
+    <a href="${link.href}" class="bottom-nav__item ${activePage===link.id?'is-active':''}">
       <span class="bottom-nav__icon">
-        <i data-lucide="send" style="width:24px;height:24px"></i>
-        <span class="bottom-nav__badge" data-notif-badge style="display:none"></span>
+        <i data-lucide="${link.icon}" style="width:22px;height:22px"></i>
+        ${link.badge ? `<span class="bottom-nav__badge" data-notif-badge style="display:none"></span>` : ''}
       </span>
-      <span class="bottom-nav__label">Request</span>
+      <span class="bottom-nav__label">${link.label}</span>
     </a>
-    <a href="profile.html" class="bottom-nav__item ${activePage==='profile'?'is-active':''}">
-      <span class="bottom-nav__icon"><i data-lucide="user" style="width:24px;height:24px"></i></span>
-      <span class="bottom-nav__label">Profil</span>
-    </a>
+    `).join('')}
   </nav>`;
 
   document.getElementById('app-sidebar').innerHTML = sidebarHtml;

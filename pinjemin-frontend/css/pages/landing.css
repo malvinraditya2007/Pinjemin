@@ -288,6 +288,7 @@
   height: 2px;
   border-top: 2px dashed var(--color-primary-300);
   z-index: 0;
+  pointer-events: none;
 }
 .step-item {
   text-align: center;
@@ -522,6 +523,7 @@
   position: absolute;
   inset: 0;
   background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
 }
 .cta-section__title {
   font-family: var(--font-display);
@@ -530,14 +532,16 @@
   color: white;
   margin-bottom: var(--space-4);
   position: relative;
+  z-index: 1;
 }
-.cta-section__sub { color: rgba(255,255,255,0.8); margin-bottom: var(--space-8); position: relative; }
+.cta-section__sub { color: rgba(255,255,255,0.8); margin-bottom: var(--space-8); position: relative; z-index: 1; }
 .cta-section__btns {
   display: flex;
   gap: var(--space-4);
   justify-content: center;
   flex-wrap: wrap;
   position: relative;
+  z-index: 1;
   margin-bottom: var(--space-8);
 }
 .cta-trust-badges {
@@ -546,6 +550,7 @@
   justify-content: center;
   flex-wrap: wrap;
   position: relative;
+  z-index: 1;
 }
 .cta-trust-badge {
   display: flex;
@@ -560,7 +565,7 @@
 .footer {
   background: var(--color-neutral-900);
   color: var(--color-neutral-400);
-  padding: var(--space-16) 0 var(--space-8);
+  padding: var(--space-6) 0 var(--space-6);
 }
 .footer__grid {
   display: grid;
@@ -631,6 +636,10 @@
   .footer__grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 768px) {
+  /* Navbar: sembunyikan nav links & actions agar tidak overflow */
+  .landing-nav .navbar__nav     { display: none; }
+  .landing-nav .navbar__actions { display: none; }
+
   .hero__inner { grid-template-columns: 1fr; }
   .phone-mockup { display: none; }
   .steps-row { grid-template-columns: 1fr; gap: var(--space-6); }
