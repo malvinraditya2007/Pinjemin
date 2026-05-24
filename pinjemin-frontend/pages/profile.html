@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Profil — Pinjemin</title>
+  <link rel="stylesheet" href="../css/reset.css"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components/buttons.css"/>
+  <link rel="stylesheet" href="../css/components/badges.css"/>
+  <link rel="stylesheet" href="../css/components/cards.css"/>
+  <link rel="stylesheet" href="../css/components/sidebar.css"/>
+  <link rel="stylesheet" href="../css/components/bottomnav.css"/>
+  <link rel="stylesheet" href="../css/components/item-card.css"/>
+  <link rel="stylesheet" href="../css/components/rating-stars.css"/>
+  <link rel="stylesheet" href="../css/components/trust-score.css"/>
+  <link rel="stylesheet" href="../css/components/modals.css"/>
+  <link rel="stylesheet" href="../css/components/forms.css"/>
+  <link rel="stylesheet" href="../css/components/toasts.css"/>
+  <link rel="stylesheet" href="../css/pages/profile.css"/>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div id="app-sidebar"></div>
+  <div class="main-content">
+    <div class="page-content">
+      <div class="page-header">
+        <h1 class="page-header__title">Profil Saya</h1>
+        <p class="page-header__desc">Kelola informasi pribadi dan reputasimu</p>
+      </div>
+      <div id="profile-content"></div>
+    </div>
+  </div>
+</div>
+<div id="app-bottom-nav"></div>
+
+<script type="module">
+import { renderAppShell } from '../js/layout.js';
+import api, { CURRENT_USER_ID } from '../js/api.js';
+import { getTrustLevel, getCategoryInfo, formatDate, formatIDR, getInitials } from '../js/utils.js';
+import toast from '../js/toast.js';
+
+renderAppShell('profile');
+
+let user = null;
+let myItems = [];
+
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const userId = params.get('user') || CURRENT_USER_ID;
+  const isMe = userId === CURRENT_USER_ID;
+
+  try {
+    // Fire both API calls in parallel for ~1s total load time
+    const [userData, allItems] = await Promise.all([
+      api.users.getById(userId),
+      api.items.getAll()
+    ]);
+    user = userData;
+    myItems = allItems.filter(i => i.ownerId === user.id);
+
+    const trust = getTrustLevel(user.trustScore);
+    const initials = getInitials(user.fullName);
+
+    document.getElementById('profile-content').innerHTML = `
+      <!-- Cover + Header -->
+      <div style="margin-bottom:var(--space-6)">
+        <div class="profile-cover"></div>
+        <div class="profile-header">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div class="profile-header__avatar">
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));color:white;font-weight:800;font-size:2rem">${initials}</div>
+            </div>
+            ${isMe ? `<button class="btn btn-outline-neutral btn-md" style="margin-top:var(--space-4)" onclick="openEditProfile()">
+              <i data-lucide="edit-3" style="width:16px;height:16px"></i> Edit Profil
+            </button>` : ''}
+          </div>
+          <div class="profile-header__identity">
+            <div class="profile-header__name">${user.fullName}</div>
+            <div class="profile-header__username">@${user.username}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-3)">
+              <span class="badge badge-trust ${trust.class}" style="font-size:0.8rem;padding:0.3em 0.8em">${trust.label} Member</span>
+            </div>
+            ${user.bio ? `<p class="profile-header__bio">${user.bio}</p>` : ''}
+            <div class="profile-header__meta">
+              <span class="profile-header__meta-item"><i data-lucide="map-pin" style="width:14px;height:14px"></i> ${user.address || 'Indonesia'}</span>
+              <span class="profile-header__meta-item"><i data-lucide="calendar" style="width:14px;height:14px"></i> Bergabung ${formatDate(user.createdAt)}</span>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="profile-stats">
+            <div class="profile-stat">
+              <div class="profile-stat__value">${myItems.length}</div>
+              <div class="profile-stat__label">Barang Terdaftar</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat__value">${user.totalLends || 0}</div>
+              <div class="profile-stat__label">Total Dipinjamkan</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat__value">${user.totalBorrows || 0}</div>
+              <div class="profile-stat__label">Total Meminjam</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat__value">${user.successfulReturns || 0}</div>
+              <div class="profile-stat__label">Dikembalikan Tepat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Score Widget -->
+      <div class="trust-card" style="margin-bottom:var(--space-6)">
+        <div class="trust-card__top">
+          <div class="trust-ring trust-ring--${trust.level}" id="trust-ring-wrap">
+            <svg class="trust-ring__svg" width="120" height="120" viewBox="0 0 120 120">
+              <circle class="trust-ring__track" cx="60" cy="60" r="50"/>
+              <circle class="trust-ring__fill" cx="60" cy="60" r="50"
+                stroke-dasharray="314"
+                stroke-dashoffset="314"
+                id="trust-ring-fill"/>
+            </svg>
+            <div class="trust-ring__center">
+              <span class="trust-ring__score">${user.trustScore}</span>
+              <span class="trust-ring__label">/100</span>
+            </div>
+          </div>
+          <div class="trust-card__info">
+            <div class="trust-card__name">${trust.label} Member</div>
+            <div class="trust-card__description">Trust score dihitung dari riwayat pengembalian, rating, dan aktivitas.</div>
+          </div>
+        </div>
+        <div class="trust-breakdown">
+          <div class="trust-breakdown__item">
+            <div class="trust-breakdown__icon">⭐</div>
+            <div class="trust-breakdown__label">Rating Rata-rata Diterima</div>
+            <div class="trust-breakdown__value">4.8 / 5</div>
+          </div>
+          <div class="trust-breakdown__item">
+            <div class="trust-breakdown__icon">✅</div>
+            <div class="trust-breakdown__label">Tingkat Pengembalian Tepat Waktu</div>
+            <div class="trust-breakdown__value">${Math.round((user.successfulReturns||0) / Math.max((user.totalBorrows||0),1) * 100)}%</div>
+          </div>
+          <div class="trust-breakdown__item">
+            <div class="trust-breakdown__icon">📦</div>
+            <div class="trust-breakdown__label">Total Aktivitas Pinjam</div>
+            <div class="trust-breakdown__value">${(user.totalBorrows||0) + (user.totalLends||0)}x</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tab-bar" id="profile-tabs" style="margin-bottom:var(--space-6)">
+        <div class="tab-bar__item is-active" data-tab="items">Barang</div>
+        <div class="tab-bar__item" data-tab="badges">Badge</div>
+      </div>
+      <div id="tab-content"></div>`;
+
+    setTimeout(() => {
+      const fill = document.getElementById('trust-ring-fill');
+      if (fill) {
+        const offset = 314 - (314 * user.trustScore / 100);
+        fill.style.transition = 'stroke-dashoffset 1.5s ease';
+        fill.style.strokeDashoffset = offset;
+      }
+    }, 300);
+
+    const myItemsHTML = myItems.length ? `
+      <div class="grid grid-cols-3 grid-gap-6">${myItems.map(item => {
+        const cat = getCategoryInfo(item.category);
+        let images = [];
+        try { images = JSON.parse(item.images || '[]'); } catch(e) { images = []; }
+        const imgHTML = images.length
+          ? `<img src="${images[0]}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;" alt="${item.title}"/>`
+          : `<div class="item-card__placeholder"><span>${cat.emoji}</span></div>`;
+
+        return `<a href="item-detail.html?id=${item.id}" class="item-card">
+          <div class="item-card__image-wrap">
+            ${imgHTML}
+            <div class="item-card__availability"><span class="badge ${item.isAvailable?'badge-available':'badge-unavailable'}">${item.isAvailable?'Tersedia':'Dipinjam'}</span></div>
+          </div>
+          <div class="item-card__body">
+            <div class="item-card__title">${item.title}</div>
+            <div class="item-card__location">📍 ${item.neighborhood}</div>
+            <div class="item-card__footer">
+              <span class="item-card__deposit ${item.depositAmount===0?'item-card__deposit--free':''}">${item.depositAmount===0?'Gratis':formatIDR(item.depositAmount)}</span>
+            </div>
+          </div>
+        </a>`;
+      }).join('')}</div>` : `<div class="empty-state"><div class="empty-state__icon">📦</div><div class="empty-state__title">Belum ada barang</div>${isMe ? `<a href="item-new.html" class="btn btn-primary btn-md btn-pill" style="margin-top:var(--space-4)">+ Tambah Barang</a>` : ''}</div>`;
+
+    const badgesHTML = `
+      <div class="grid grid-cols-4 grid-gap-4">
+        ${[
+          {icon:'🤝', name:'First Lend', desc:'Dipinjamkan pertama kali', earned:true},
+          {icon:'⭐', name:'5-Star Borrower', desc:'Dapat 5 bintang 3x berturut-turut', earned:true},
+          {icon:'🚀', name:'Trust Rocket', desc:'Trust score mencapai 80+', earned:true},
+          {icon:'🏆', name:'Community Hero', desc:'50+ pinjaman berhasil', earned:false},
+          {icon:'💎', name:'Verified Member', desc:'Trust score 90+', earned:false},
+          {icon:'🌍', name:'Eco Champion', desc:'100 pinjaman — hemat 10kg CO₂', earned:false},
+        ].map(b => `
+          <div class="card" style="${b.earned?'':'opacity:0.45;filter:grayscale(1)'}">
+            <div class="card__body" style="text-align:center;padding:var(--space-5)">
+              <div style="font-size:2rem;margin-bottom:var(--space-2)">${b.icon}</div>
+              <div style="font-weight:700;font-size:var(--text-body-sm-size);margin-bottom:4px">${b.name}</div>
+              <div style="font-size:var(--text-body-xs-size);color:var(--color-neutral-400)">${b.desc}</div>
+              ${b.earned ? '<div style="margin-top:var(--space-2)"><span class="badge badge-approved">Diraih!</span></div>' : ''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+
+    const tabContent = document.getElementById('tab-content');
+    tabContent.innerHTML = myItemsHTML;
+
+    document.getElementById('profile-tabs').addEventListener('click', e => {
+      const tab = e.target.closest('[data-tab]');
+      if (!tab) return;
+      document.querySelectorAll('#profile-tabs .tab-bar__item').forEach(t => t.classList.remove('is-active'));
+      tab.classList.add('is-active');
+      tabContent.innerHTML = tab.dataset.tab === 'items' ? myItemsHTML : badgesHTML;
+      lucide.createIcons();
+    });
+
+    lucide.createIcons();
+  } catch(e) {
+    document.getElementById('profile-content').innerHTML = `<div class="empty-state"><div class="empty-state__icon">❌</div><div class="empty-state__title">Profil tidak ditemukan</div></div>`;
+  }
+}
+
+window.openEditProfile = () => {
+  // Create modal if not exists
+  if (!document.getElementById('edit-profile-modal-container')) {
+    const div = document.createElement('div');
+    div.id = 'edit-profile-modal-container';
+    div.innerHTML = `
+      <div class="modal-backdrop" id="edit-profile-overlay">
+        <div class="modal modal--sm" id="edit-profile-modal">
+          <div class="modal__header">
+            <h2 class="modal__title">Edit Profil</h2>
+            <button class="modal__close" onclick="closeEditProfile()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+          </div>
+          <div class="modal__body">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap</label>
+              <input type="text" class="form-input" id="edit-fullname" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <div style="position:relative">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--color-neutral-400);font-weight:600;pointer-events:none">@</span>
+                <input type="text" class="form-input" id="edit-username" style="padding-left:28px" placeholder="budi_santoso" autocomplete="off" />
+              </div>
+              <div class="form-hint" style="margin-top:4px;font-size:var(--text-body-xs-size);color:var(--color-neutral-400)">Huruf kecil, angka, dan underscore. 3–30 karakter.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bio Singkat</label>
+              <textarea class="form-textarea" id="edit-bio" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lokasi / Alamat</label>
+              <input type="text" class="form-input" id="edit-address" />
+            </div>
+          </div>
+          <div class="modal__footer" style="display:flex;justify-content:flex-end;gap:var(--space-3)">
+            <button class="btn btn-ghost" onclick="closeEditProfile()">Batal</button>
+            <button class="btn btn-primary btn-pill" id="save-edit-btn" onclick="saveProfile()">Simpan Perubahan</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(div);
+    // Auto-lowercase + strip invalid chars as the user types (attached once)
+    document.getElementById('edit-username').addEventListener('input', function() {
+      const pos = this.selectionStart;
+      this.value = this.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+      this.setSelectionRange(pos, pos);
+    });
+
+    lucide.createIcons();
+  }
+  
+  // Set values now that the elements definitely exist
+  document.getElementById('edit-fullname').value = user.fullName;
+  document.getElementById('edit-username').value = user.username || '';
+  document.getElementById('edit-bio').value = user.bio || '';
+  document.getElementById('edit-address').value = user.address || '';
+  
+  setTimeout(() => {
+    document.getElementById('edit-profile-overlay').classList.add('is-open');
+  }, 10);
+};
+
+window.closeEditProfile = () => {
+  const overlay = document.getElementById('edit-profile-overlay');
+  if (overlay) overlay.classList.remove('is-open');
+};
+
+window.saveProfile = async () => {
+  const fullName = document.getElementById('edit-fullname').value.trim();
+  const username = document.getElementById('edit-username').value.trim();
+  const bio = document.getElementById('edit-bio').value.trim();
+  const address = document.getElementById('edit-address').value.trim();
+  
+  if (!fullName) { toast.error('Error', 'Nama lengkap wajib diisi'); return; }
+  if (!username) { toast.error('Error', 'Username wajib diisi'); return; }
+  if (!/^[a-z0-9_]{3,30}$/.test(username)) {
+    toast.error('Username Tidak Valid', 'Gunakan huruf kecil, angka, atau underscore (3–30 karakter)');
+    return;
+  }
+  
+  const btn = document.getElementById('save-edit-btn');
+  const ogText = btn.innerHTML;
+  btn.innerHTML = 'Menyimpan...';
+  btn.disabled = true;
+  
+  try {
+    await api.users.updateMe({ fullName, username, bio, address });
+    toast.success('Berhasil', 'Profil berhasil diperbarui!');
+    closeEditProfile();
+    init(); // reload data
+  } catch(e) {
+    toast.error('Gagal', e.message);
+  } finally {
+    btn.innerHTML = ogText;
+    btn.disabled = false;
+  }
+};
+
+init();
+
+
+
+lucide.createIcons();
+</script>
+</body>
+</html>

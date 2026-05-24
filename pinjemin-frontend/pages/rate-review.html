@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Beri Rating — Pinjemin</title>
+  <link rel="stylesheet" href="../css/reset.css"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components/buttons.css"/>
+  <link rel="stylesheet" href="../css/components/badges.css"/>
+  <link rel="stylesheet" href="../css/components/cards.css"/>
+  <link rel="stylesheet" href="../css/components/forms.css"/>
+  <link rel="stylesheet" href="../css/components/toasts.css"/>
+  <link rel="stylesheet" href="../css/components/sidebar.css"/>
+  <link rel="stylesheet" href="../css/components/bottomnav.css"/>
+  <link rel="stylesheet" href="../css/components/rating-stars.css"/>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div id="app-sidebar"></div>
+  <div class="main-content">
+    <header class="top-bar">
+      <button class="btn btn-ghost btn-icon" id="sidebar-toggle"><i data-lucide="menu" style="width:22px;height:22px"></i></button>
+      <span class="text-heading-md" style="font-family:var(--font-display)">Beri Rating</span>
+    </header>
+    <div class="page-content" style="max-width:580px">
+      <div class="card">
+        <div class="card__header">
+          <div>
+            <div class="text-heading-lg">⭐ Bagaimana pengalamanmu?</div>
+            <div style="font-size:var(--text-body-sm-size);color:var(--color-neutral-500);margin-top:2px">Mesin Bor Bosch GSB 550 dari Andi Pratama</div>
+          </div>
+        </div>
+        <div class="card__body">
+          <!-- Owner Rating -->
+          <div class="form-section">
+            <div class="form-section__title">Rating untuk Pemilik Barang</div>
+            <div class="form-section__desc">Nilai keresponsifan dan keramahan pemilik barang.</div>
+            <div class="star-input" id="owner-stars" style="margin-bottom:var(--space-4)">
+              <input type="radio" class="star-input__radio" name="owner-rating" id="o5" value="5"/><label class="star-input__label" for="o5"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+              <input type="radio" class="star-input__radio" name="owner-rating" id="o4" value="4"/><label class="star-input__label" for="o4"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+              <input type="radio" class="star-input__radio" name="owner-rating" id="o3" value="3"/><label class="star-input__label" for="o3"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+              <input type="radio" class="star-input__radio" name="owner-rating" id="o2" value="2"/><label class="star-input__label" for="o2"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+              <input type="radio" class="star-input__radio" name="owner-rating" id="o1" value="1"/><label class="star-input__label" for="o1"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Kondisi Barang <span class="required">*</span></label>
+              <div class="star-input" id="item-stars" style="margin-bottom:var(--space-3)">
+                <input type="radio" class="star-input__radio" name="item-cond" id="c5" value="5"/><label class="star-input__label" for="c5"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+                <input type="radio" class="star-input__radio" name="item-cond" id="c4" value="4"/><label class="star-input__label" for="c4"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+                <input type="radio" class="star-input__radio" name="item-cond" id="c3" value="3"/><label class="star-input__label" for="c3"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+                <input type="radio" class="star-input__radio" name="item-cond" id="c2" value="2"/><label class="star-input__label" for="c2"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+                <input type="radio" class="star-input__radio" name="item-cond" id="c1" value="1"/><label class="star-input__label" for="c1"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></label>
+              </div>
+              <div class="form-hint">Apakah kondisi barang sesuai deskripsi?</div>
+            </div>
+
+            <div class="form-group" style="margin-top:var(--space-5)">
+              <label class="form-label" for="owner-comment">Komentar (opsional)</label>
+              <textarea class="form-textarea" id="owner-comment" rows="3" placeholder="Bagikan pengalamanmu meminjam barang ini..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="card__footer" style="display:flex;justify-content:space-between">
+          <a href="requests.html" class="btn btn-ghost btn-md">Lewati</a>
+          <button class="btn btn-accent btn-lg btn-pill" id="submit-rating">
+            <i data-lucide="send" style="width:18px;height:18px"></i>
+            Kirim Rating
+          </button>
+        </div>
+      </div>
+
+      <div class="info-card" style="margin-top:var(--space-5)">
+        <div class="info-card__icon">🚀</div>
+        <div class="info-card__content">
+          <div class="info-card__title">Rating membantu komunitas</div>
+          <div class="info-card__text">Rating yang jujur membantu pengguna lain membuat keputusan lebih baik dan memperbarui trust score semua pihak.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="app-bottom-nav"></div>
+
+<script type="module">
+import { renderAppShell } from '../js/layout.js';
+import toast from '../js/toast.js';
+
+renderAppShell('requests');
+
+document.getElementById('submit-rating').addEventListener('click', () => {
+  const ownerRating = document.querySelector('input[name="owner-rating"]:checked')?.value;
+  const itemCond    = document.querySelector('input[name="item-cond"]:checked')?.value;
+  if (!ownerRating || !itemCond) {
+    toast.error('Rating belum lengkap', 'Pilih bintang untuk pemilik dan kondisi barang.');
+    return;
+  }
+  toast.success('Rating terkirim! ⭐', 'Terima kasih! Trust score kamu diperbarui.');
+  setTimeout(() => location.href = 'requests.html', 2000);
+});
+
+lucide.createIcons();
+</script>
+</body>
+</html>

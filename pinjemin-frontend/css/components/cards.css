@@ -1,0 +1,179 @@
+/* ============================================================
+   PINJEMIN — CARDS
+   Base card, stat card, info card styles
+   ============================================================ */
+
+/* ── Base Card ───────────────────────────────────────────── */
+.card {
+  background-color: var(--color-neutral-0);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-neutral-200);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card--hover:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-4px);
+}
+
+.card--flat {
+  box-shadow: none;
+}
+
+.card--bordered {
+  border-color: var(--color-primary-200);
+}
+
+.card__body {
+  padding: var(--space-6);
+}
+
+.card__body--sm {
+  padding: var(--space-4);
+}
+
+.card__body--lg {
+  padding: var(--space-8);
+}
+
+.card__header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.card__footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-neutral-200);
+  background-color: var(--color-neutral-50);
+}
+
+/* ── Stat Card ───────────────────────────────────────────── */
+.stat-card {
+  background-color: var(--color-neutral-0);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-neutral-200);
+  padding: var(--space-5) var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stat-card__label {
+  font-size: var(--text-body-xs-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-500);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-2);
+}
+
+.stat-card__value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-neutral-900);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+.stat-card__sub {
+  font-size: var(--text-body-xs-size);
+  color: var(--color-neutral-400);
+}
+
+.stat-card--blue   .stat-card__value { color: var(--color-info); }
+.stat-card--green  .stat-card__value { color: var(--color-primary-600); }
+.stat-card--orange .stat-card__value { color: var(--color-accent-500); }
+.stat-card--purple .stat-card__value { color: #7C3AED; }
+
+/* ── Info Card ───────────────────────────────────────────── */
+.info-card {
+  background-color: var(--color-primary-50);
+  border: 1px solid var(--color-primary-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  gap: var(--space-3);
+}
+
+.info-card--warning {
+  background-color: #FFFBEB;
+  border-color: #FDE68A;
+}
+
+.info-card--danger {
+  background-color: #FEF2F2;
+  border-color: #FECACA;
+}
+
+.info-card__icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.info-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.info-card__title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-body-sm-size);
+  color: var(--color-primary-800);
+  margin-bottom: var(--space-1);
+}
+
+.info-card--warning .info-card__title { color: #92400E; }
+.info-card--danger  .info-card__title { color: #991B1B; }
+
+.info-card__text {
+  font-size: var(--text-body-sm-size);
+  color: var(--color-primary-700);
+  line-height: 1.5;
+}
+
+.info-card--warning .info-card__text { color: #78350F; }
+.info-card--danger  .info-card__text { color: #7F1D1D; }
+
+/* ── Empty State Card ────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-16) var(--space-8);
+  color: var(--color-neutral-400);
+}
+
+.empty-state__icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+  opacity: 0.6;
+}
+
+.empty-state__title {
+  font-family: var(--font-display);
+  font-size: var(--text-heading-lg-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-600);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state__text {
+  font-size: var(--text-body-sm-size);
+  color: var(--color-neutral-400);
+  max-width: 320px;
+  margin-bottom: var(--space-6);
+}

@@ -1,0 +1,184 @@
+/* ============================================================
+   PINJEMIN — SIDEBAR (Dashboard Navigation)
+   ============================================================ */
+
+.sidebar__logo {
+  padding: var(--space-6) var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-neutral-200);
+  text-decoration: none;
+}
+
+.sidebar__logo-mark {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.05em;
+}
+
+.sidebar__logo-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-neutral-900);
+  letter-spacing: -0.02em;
+}
+
+/* ── User Info ───────────────────────────────────────────── */
+.sidebar__user {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-bottom: 1px solid var(--color-neutral-200);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.sidebar__user:hover {
+  background-color: var(--color-neutral-50);
+}
+
+.sidebar__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid var(--color-primary-200);
+}
+
+.sidebar__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sidebar__user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar__username {
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-800);
+  truncate: true;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Navigation ──────────────────────────────────────────── */
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-3) var(--space-3);
+  overflow-y: auto;
+}
+
+.sidebar__section {
+  margin-bottom: var(--space-6);
+}
+
+.sidebar__section-label {
+  padding: 0 var(--space-2) var(--space-2);
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-neutral-400);
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-600);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.sidebar__link:hover {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+}
+
+.sidebar__link.is-active {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sidebar__link.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background-color: var(--color-primary-500);
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+}
+
+.sidebar__link svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.sidebar__link-text {
+  flex: 1;
+}
+
+.sidebar__link-badge {
+  min-width: 20px;
+  height: 20px;
+  background-color: var(--color-accent-500);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.sidebar__link-badge--urgent {
+  background-color: var(--color-danger);
+  animation: sidebar-badge-pulse 2s ease infinite;
+}
+
+@keyframes sidebar-badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.15); }
+}
+
+/* ── CTA Button ──────────────────────────────────────────── */
+.sidebar__cta {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+/* ── Bottom Section ──────────────────────────────────────── */
+.sidebar__bottom {
+  padding: var(--space-4) var(--space-3);
+  border-top: 1px solid var(--color-neutral-200);
+  margin-top: auto;
+}

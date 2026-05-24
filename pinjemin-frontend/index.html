@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pinjemin — Access Over Ownership. Community Over Consumption.</title>
+  <meta name="description"
+    content="Stop buying for one-time use. Borrow from neighbors, colleagues, and friends. Pinjemin makes sharing seamless, safe, and sustainable." />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components/buttons.css" />
+  <link rel="stylesheet" href="css/components/badges.css" />
+  <link rel="stylesheet" href="css/components/navbar.css" />
+  <link rel="stylesheet" href="css/components/trust-score.css" />
+  <link rel="stylesheet" href="css/pages/landing.css" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════════════════ -->
+  <nav class="navbar landing-nav" id="landing-nav">
+    <div class="navbar__inner container">
+      <a href="#" class="navbar__logo">
+        <div class="navbar__logo-mark">P</div>
+        <span class="navbar__logo-text">Pinje<span>min</span></span>
+      </a>
+
+      <div class="navbar__nav">
+        <a href="#how" class="navbar__link">Cara Kerja</a>
+        <a href="#categories" class="navbar__link">Kategori</a>
+        <a href="#trust" class="navbar__link">Trust System</a>
+        <a href="#impact" class="navbar__link">Dampak</a>
+      </div>
+
+      <div class="navbar__actions">
+        <a href="pages/discover.html" class="btn btn-outline btn-md btn-pill">Jelajahi Barang</a>
+        <a href="pages/dashboard.html" class="btn btn-accent btn-md btn-pill">Mulai Sekarang</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════════
+     SECTION 1 — HERO
+════════════════════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <!-- Animated blobs -->
+    <div class="hero-blob hero-blob--1"></div>
+    <div class="hero-blob hero-blob--2"></div>
+    <div class="hero-blob hero-blob--3"></div>
+
+    <div class="container">
+      <div class="hero__inner">
+        <!-- Left Column -->
+        <div class="hero__left">
+          <h1 class="hero__title">
+            Your Community Is Your<br />
+            <span class="highlight">Biggest Warehouse.</span>
+          </h1>
+
+          <p class="hero__sub">
+            Stop buying for one-time use. Borrow from neighbors, colleagues, and friends.
+            Pinjemin makes sharing seamless, safe, and sustainable.
+          </p>
+
+          <div class="hero__cta-row">
+            <a href="pages/dashboard.html" class="btn btn-accent btn-xl btn-pill">
+              Mulai Sekarang
+              <i data-lucide="arrow-right" style="width:20px;height:20px;"></i>
+            </a>
+            <a href="#how" class="hero__text-link">
+              Lihat Cara Kerja
+              <i data-lucide="chevron-down" style="width:18px;height:18px;"></i>
+            </a>
+          </div>
+
+          <div class="hero__social-proof">
+            <span class="hero__proof-item"><strong>2.400+</strong> barang tersedia</span>
+            <span class="hero__proof-dot"></span>
+            <span class="hero__proof-item"><strong>890+</strong> komunitas</span>
+            <span class="hero__proof-dot"></span>
+            <span class="hero__proof-item"><strong>4.8★</strong> rating rata-rata</span>
+          </div>
+        </div>
+
+        <!-- Right Column — Phone Mockup -->
+        <div class="hero__right">
+          <div class="phone-mockup">
+            <!-- Floating Cards -->
+            <div class="floating-card floating-card--approved">
+              <div class="floating-card__icon">✅</div>
+              <div class="floating-card__label">Permintaan</div>
+              <div class="floating-card__value floating-card__value--green">Disetujui!</div>
+            </div>
+
+            <div class="floating-card floating-card--distance">
+              <div class="floating-card__icon">📍</div>
+              <div class="floating-card__label">Power Drill Pro</div>
+              <div class="floating-card__value">1.2 km dari kamu</div>
+            </div>
+
+            <div class="floating-card floating-card--trust">
+              <div class="floating-card__icon">⭐</div>
+              <div class="floating-card__label">Trust Score</div>
+              <div class="floating-card__value floating-card__value--green">87 — Trusted</div>
+            </div>
+
+            <!-- Phone Frame -->
+            <div class="phone-mockup__frame">
+              <div class="phone-mockup__screen">
+                <div class="phone-mockup__notch"></div>
+                <div class="phone-mockup__app-bar">
+                  <span class="phone-mockup__app-logo">Pinjemin</span>
+                  <div class="phone-mockup__app-bell"></div>
+                </div>
+                <div class="phone-mockup__item">
+                  <div class="phone-mockup__item-img">🔧</div>
+                  <div class="phone-mockup__item-body">
+                    <div class="phone-mockup__item-title">Mesin Bor Bosch</div>
+                    <div class="phone-mockup__item-loc">📍 Menteng · 1.2km</div>
+                    <span class="phone-mockup__item-btn">Pinjam →</span>
+                  </div>
+                </div>
+                <div class="phone-mockup__item">
+                  <div class="phone-mockup__item-img">🏕️</div>
+                  <div class="phone-mockup__item-body">
+                    <div class="phone-mockup__item-title">Tenda Camping 4 Orang</div>
+                    <div class="phone-mockup__item-loc">📍 Gondangdia · 2.5km</div>
+                    <span class="phone-mockup__item-btn">Pinjam →</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+     SECTION 2 — HOW IT WORKS
+════════════════════════════════════════════════════════ -->
+  <section class="how-section section" id="how">
+    <div class="container">
+      <div class="text-center" style="margin-bottom:var(--space-12)">
+        <div class="landing-section-tag reveal">📖 Cara Kerja</div>
+        <h2 class="text-display-lg reveal" style="color:var(--color-neutral-900)">Semudah 1-2-3</h2>
+        <p class="text-body-lg text-secondary reveal" style="max-width:500px;margin:var(--space-4) auto 0">
+          Dari daftar barang sampai pengembalian, semua terkelola dalam satu platform.
+        </p>
+      </div>
+
+      <div class="steps-row stagger">
+        <div class="step-item reveal">
+          <div class="step-item__num">1</div>
+          <div class="step-item__icon">📦</div>
+          <h3 class="step-item__title">Daftarkan Barang</h3>
+          <p class="step-item__desc">Foto, deskripsikan, atur jadwal. 2 menit selesai. Barangmu siap dipinjam komunitas.
+          </p>
+        </div>
+        <div class="step-item reveal">
+          <div class="step-item__num">2</div>
+          <div class="step-item__icon">🤝</div>
+          <h3 class="step-item__title">Ajukan Pinjaman</h3>
+          <p class="step-item__desc">Cari item, kirim permintaan, tunggu konfirmasi. Semua aman dengan sistem trust.</p>
+        </div>
+        <div class="step-item reveal">
+          <div class="step-item__num">3</div>
+          <div class="step-item__icon">🌟</div>
+          <h3 class="step-item__title">Kembalikan & Nilai</h3>
+          <p class="step-item__desc">Kembalikan tepat waktu, kasih bintang, bangun reputasi. Trust score kamu naik!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+     SECTION 3 — CATEGORIES
+════════════════════════════════════════════════════════ -->
+  <section class="categories-section section" id="categories">
+    <div class="container">
+      <div class="text-center" style="margin-bottom:var(--space-10)">
+        <div class="landing-section-tag reveal">🏷️ Kategori</div>
+        <h2 class="text-display-lg reveal" style="color:var(--color-neutral-900)">Apa yang bisa kamu pinjam?</h2>
+        <p class="text-body-lg text-secondary reveal" style="max-width:480px;margin:var(--space-4) auto 0">
+          Dari peralatan rumah hingga kendaraan — semua ada di komunitasmu.
+        </p>
+      </div>
+
+      <div class="categories-grid reveal">
+        <a href="pages/discover.html?category=TOOLS" class="category-card">
+          <span class="category-card__emoji">🔧</span>
+          <span class="category-card__name">Peralatan</span>
+          <span class="category-card__count">284 item</span>
+        </a>
+        <a href="pages/discover.html?category=ELECTRONICS" class="category-card">
+          <span class="category-card__emoji">💻</span>
+          <span class="category-card__name">Elektronik</span>
+          <span class="category-card__count">192 item</span>
+        </a>
+        <a href="pages/discover.html?category=SPORTS" class="category-card">
+          <span class="category-card__emoji">🏋️</span>
+          <span class="category-card__name">Olahraga</span>
+          <span class="category-card__count">156 item</span>
+        </a>
+        <a href="pages/discover.html?category=KITCHEN" class="category-card">
+          <span class="category-card__emoji">🍳</span>
+          <span class="category-card__name">Dapur</span>
+          <span class="category-card__count">118 item</span>
+        </a>
+        <a href="pages/discover.html?category=GARDEN" class="category-card">
+          <span class="category-card__emoji">🌿</span>
+          <span class="category-card__name">Kebun</span>
+          <span class="category-card__count">94 item</span>
+        </a>
+        <a href="pages/discover.html?category=VEHICLE" class="category-card">
+          <span class="category-card__emoji">🚗</span>
+          <span class="category-card__name">Kendaraan</span>
+          <span class="category-card__count">67 item</span>
+        </a>
+        <a href="pages/discover.html?category=BABY_KIDS" class="category-card">
+          <span class="category-card__emoji">👶</span>
+          <span class="category-card__name">Bayi & Anak</span>
+          <span class="category-card__count">143 item</span>
+        </a>
+        <a href="pages/discover.html?category=BOOKS_MEDIA" class="category-card">
+          <span class="category-card__emoji">📚</span>
+          <span class="category-card__name">Buku & Media</span>
+          <span class="category-card__count">321 item</span>
+        </a>
+        <a href="pages/discover.html?category=FASHION" class="category-card">
+          <span class="category-card__emoji">👗</span>
+          <span class="category-card__name">Fashion</span>
+          <span class="category-card__count">89 item</span>
+        </a>
+        <a href="pages/discover.html?category=OUTDOOR" class="category-card">
+          <span class="category-card__emoji">⛺</span>
+          <span class="category-card__name">Outdoor</span>
+          <span class="category-card__count">112 item</span>
+        </a>
+        <a href="pages/discover.html" class="category-card">
+          <span class="category-card__emoji">📦</span>
+          <span class="category-card__name">Lainnya</span>
+          <span class="category-card__count">204 item</span>
+        </a>
+        <a href="pages/discover.html" class="category-card"
+          style="background:linear-gradient(135deg,var(--color-primary-50),var(--color-primary-100));border-color:var(--color-primary-200)">
+          <span class="category-card__emoji">🔍</span>
+          <span class="category-card__name" style="color:var(--color-primary-700)">Lihat Semua</span>
+          <span class="category-card__count">2.400+ item</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+     SECTION 4 — TRUST SYSTEM
+════════════════════════════════════════════════════════ -->
+  <section class="trust-section section" id="trust">
+    <div class="container">
+      <div class="layout-two-col layout-two-col--40-60" style="align-items:center">
+        <!-- Left — Trust Meter -->
+        <div class="text-center reveal">
+          <div class="trust-meter">
+            <svg class="trust-meter__svg" viewBox="0 0 200 200" width="240" height="240">
+              <circle class="trust-meter__arc-track" cx="100" cy="100" r="80" />
+              <circle class="trust-meter__arc-fill" cx="100" cy="100" r="80" stroke-dashoffset="628" />
+            </svg>
+            <div class="trust-meter__content">
+              <span class="trust-meter__number" id="trust-score-display">0</span>
+              <span class="trust-meter__sub">Trust Score</span>
+            </div>
+          </div>
+
+          <div class="trust-levels" style="justify-content:center;margin-top:var(--space-6)">
+            <span class="trust-level-pill trust-level-pill--new">🔘 New</span>
+            <span class="trust-level-pill trust-level-pill--member">🔵 Member</span>
+            <span class="trust-level-pill trust-level-pill--trusted">🟢 Trusted</span>
+            <span class="trust-level-pill trust-level-pill--verified">💜 Verified</span>
+          </div>
+        </div>
+
+        <!-- Right — Content -->
+        <div class="reveal">
+          <div class="landing-section-tag">🛡️ Trust System</div>
+          <h2 class="text-display-md" style="color:white;margin-bottom:var(--space-6)">
+            Ekosistem High-Trust,<br />Bukan Sekadar Marketplace
+          </h2>
+
+          <div>
+            <div class="trust-point">
+              <div class="trust-point__icon">🔍</div>
+              <div>
+                <div class="trust-point__title">Profil Terverifikasi</div>
+                <div class="trust-point__desc">Setiap pengguna memiliki identitas jelas dan riwayat aktivitas yang
+                  transparan.</div>
+              </div>
+            </div>
+            <div class="trust-point">
+              <div class="trust-point__icon">⭐</div>
+              <div>
+                <div class="trust-point__title">Sistem Rating Dua Arah</div>
+                <div class="trust-point__desc">Peminjam dan pemilik saling menilai. Akuntabilitas berjalan dua arah.
+                </div>
+              </div>
+            </div>
+            <div class="trust-point">
+              <div class="trust-point__icon">🛡️</div>
+              <div>
+                <div class="trust-point__title">Owner Punya Kontrol Penuh</div>
+                <div class="trust-point__desc">Setujui atau tolak permintaan. Lihat profil peminjam sebelum memutuskan.
+                </div>
+              </div>
+            </div>
+            <div class="trust-point">
+              <div class="trust-point__icon">📊</div>
+              <div>
+                <div class="trust-point__title">Trust Score Transparan</div>
+                <div class="trust-point__desc">Skor 0–100 yang dihitung dari riwayat, rating, dan konsistensi
+                  pengembalian.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+     SECTION 5 — IMPACT COUNTERS
+════════════════════════════════════════════════════════ -->
+  <section class="impact-section section" id="impact">
+    <div class="container">
+      <div class="text-center reveal" style="margin-bottom:var(--space-12)">
+        <div class="landing-section-tag">🌍 Dampak Nyata</div>
+        <h2 class="text-display-lg" style="color:var(--color-neutral-900)">Setiap pinjaman, dampak nyata</h2>
+        <p class="text-body-lg text-secondary" style="max-width:480px;margin:var(--space-4) auto 0">
+          Setiap pinjaman adalah pilihan untuk planet yang lebih baik.
+        </p>
+      </div>
+
+      <div class="impact-grid stagger">
+        <div class="impact-item reveal">
+          <div class="impact-item__value" id="counter-borrows">0</div>
+          <div class="impact-item__label">Pinjaman Berhasil</div>
+          <div class="impact-item__sub">dan terus bertambah setiap hari</div>
+        </div>
+        <div class="impact-item reveal">
+          <div class="impact-item__value" id="counter-co2">0</div>
+          <div class="impact-item__label">CO₂ Dihemat</div>
+          <div class="impact-item__sub">setara 480 pohon selama setahun</div>
+        </div>
+        <div class="impact-item reveal">
+          <div class="impact-item__value" id="counter-savings">0</div>
+          <div class="impact-item__label">Dihemat Komunitas</div>
+          <div class="impact-item__sub">dari biaya pembelian yang dihindari</div>
+        </div>
+        <div class="impact-item reveal">
+          <div class="impact-item__value" id="counter-communities">0</div>
+          <div class="impact-item__label">Komunitas Aktif</div>
+          <div class="impact-item__sub">di seluruh kota Indonesia</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+     SECTION 6 — TESTIMONIALS
+════════════════════════════════════════════════════════ -->
+  <section class="testimonials-section section">
+    <div class="container">
+      <div class="text-center reveal" style="margin-bottom:var(--space-10)">
+        <div class="landing-section-tag">💬 Cerita Komunitas</div>
+        <h2 class="text-display-lg" style="color:var(--color-neutral-900)">Mereka sudah merasakan manfaatnya</h2>
+      </div>
+
+      <div class="testimonials-grid stagger">
+        <div class="testimonial-card reveal">
+          <div class="testimonial-card__quote">"</div>
+          <p class="testimonial-card__text">
+            Butuh mesin bor cuma buat pasang rak, ga perlu beli. Langsung pinjam dari tetangga via Pinjemin.
+            Selesai dalam 10 menit, gratis, dan tetangganya super ramah. Luar biasa!
+          </p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar">R</div>
+            <div>
+              <div class="testimonial-card__name">Rizky Pratama</div>
+              <div class="testimonial-card__loc">📍 Menteng, Jakarta • ⭐⭐⭐⭐⭐</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal" style="border-color:var(--color-primary-200)">
+          <div class="testimonial-card__quote">"</div>
+          <p class="testimonial-card__text">
+            Saya punya banyak barang yang jarang dipakai. Sekarang, barang-barang itu bisa bermanfaat
+            untuk orang lain dan saya dapat kepercayaan komunitas. Win-win!
+          </p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar" style="background:linear-gradient(135deg,#FB923C,#F97316)">S</div>
+            <div>
+              <div class="testimonial-card__name">Sari Dewi</div>
+              <div class="testimonial-card__loc">📍 Gondangdia, Jakarta • ⭐⭐⭐⭐⭐</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="testimonial-card__quote">"</div>
+          <p class="testimonial-card__text">
+            Trust score saya sudah 92 sekarang! Setiap kali mengembalikan barang tepat waktu,
+            rasanya seperti menabung kepercayaan. Platform ini benar-benar mengubah cara saya bertetangga.
+          </p>
+          <div class="testimonial-card__author">
+            <div class="testimonial-card__avatar" style="background:linear-gradient(135deg,#7C3AED,#6D28D9)">A</div>
+            <div>
+              <div class="testimonial-card__name">Ahmad Fauzi</div>
+              <div class="testimonial-card__loc">📍 Tebet, Jakarta • ⭐⭐⭐⭐⭐</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+     SECTION 7 — CTA BANNER
+════════════════════════════════════════════════════════ -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="reveal">
+        <h2 class="cta-section__title">Siap jadi bagian dari gerakan ini?</h2>
+        <p class="cta-section__sub text-body-lg">
+          Bergabung dengan ribuan orang yang sudah memilih berbagi daripada membeli.
+        </p>
+        <div class="cta-section__btns">
+          <a href="pages/dashboard.html" class="btn btn-white btn-xl btn-pill">
+            Mulai Sekarang — Gratis
+            <i data-lucide="arrow-right" style="width:20px;height:20px;"></i>
+          </a>
+          <a href="pages/discover.html" class="btn btn-xl btn-pill"
+            style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.4)">
+            Lihat Barang Tersedia
+          </a>
+        </div>
+        <div class="cta-trust-badges">
+          <span class="cta-trust-badge">✅ 100% Gratis</span>
+          <span class="cta-trust-badge">🚫 Tanpa Iklan</span>
+          <span class="cta-trust-badge">🔒 Data Aman</span>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div>
+          <a href="#" class="navbar__logo" style="margin-bottom:var(--space-4)">
+            <div class="navbar__logo-mark">P</div>
+            <span class="navbar__logo-text" style="color:white">Pinje<span>min</span></span>
+          </a>
+          <p class="footer__brand-desc">
+            "Access Over Ownership. Community Over Consumption."<br />
+            Platform berbagi komunitas yang membuat meminjam jadi mudah, aman, dan berkelanjutan.
+          </p>
+        </div>
+
+        <div>
+          <div class="footer__col-title">Platform</div>
+          <div class="footer__links">
+            <a href="pages/discover.html" class="footer__link">Temukan Barang</a>
+            <a href="pages/item-new.html" class="footer__link">Daftarkan Barang</a>
+            <a href="pages/dashboard.html" class="footer__link">Dashboard</a>
+            <a href="pages/profile.html" class="footer__link">Profil Saya</a>
+          </div>
+        </div>
+
+        <div>
+          <div class="footer__col-title">Fitur</div>
+          <div class="footer__links">
+            <a href="#trust" class="footer__link">Trust System</a>
+            <a href="pages/approvals.html" class="footer__link">Kelola Permintaan</a>
+            <a href="pages/notifications.html" class="footer__link">Notifikasi</a>
+            <a href="#impact" class="footer__link">Dampak Lingkungan</a>
+          </div>
+        </div>
+
+        <div>
+          <div class="footer__col-title">Tentang</div>
+          <div class="footer__links">
+            <a href="#" class="footer__link">Tentang Pinjemin</a>
+            <a href="#" class="footer__link">SDG 12 Komitmen</a>
+            <a href="#" class="footer__link">Kebijakan Privasi</a>
+            <a href="#" class="footer__link">Syarat & Ketentuan</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <span>© 2026 Pinjemin. Made with 💚 for Indonesian communities.</span>
+        <span>Stop buying, start Pinjemin.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/pages/landing.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+
+</html>

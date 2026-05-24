@@ -1,0 +1,213 @@
+/* ============================================================
+   PINJEMIN — TRUST SCORE WIDGET
+   Circular progress, breakdown, levels
+   ============================================================ */
+
+/* ── Circular Score Ring ─────────────────────────────────── */
+.trust-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trust-ring__svg {
+  transform: rotate(-90deg);
+}
+
+.trust-ring__track {
+  fill: none;
+  stroke: var(--color-neutral-200);
+  stroke-width: 8;
+}
+
+.trust-ring__fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.trust-ring--new      .trust-ring__fill { stroke: var(--trust-low); }
+.trust-ring--member   .trust-ring__fill { stroke: var(--color-info); }
+.trust-ring--trusted  .trust-ring__fill { stroke: var(--trust-high); }
+.trust-ring--verified .trust-ring__fill { stroke: var(--trust-verified); }
+
+.trust-ring__center {
+  position: absolute;
+  text-align: center;
+}
+
+.trust-ring__score {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-900);
+  line-height: 1;
+  display: block;
+}
+
+.trust-ring__label {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-neutral-400);
+}
+
+/* ── Score Card ──────────────────────────────────────────── */
+.trust-card {
+  background-color: white;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.trust-card__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.trust-card__info {
+  flex: 1;
+}
+
+.trust-card__name {
+  font-family: var(--font-display);
+  font-size: var(--text-heading-xl-size);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-900);
+  margin-bottom: var(--space-2);
+}
+
+.trust-card__description {
+  font-size: var(--text-body-sm-size);
+  color: var(--color-neutral-500);
+}
+
+/* ── Breakdown Items ─────────────────────────────────────── */
+.trust-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.trust-breakdown__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.trust-breakdown__icon {
+  font-size: 1rem;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.trust-breakdown__label {
+  flex: 1;
+  font-size: var(--text-body-sm-size);
+  color: var(--color-neutral-600);
+}
+
+.trust-breakdown__value {
+  font-family: var(--font-mono);
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-800);
+}
+
+/* ── Trust Level Bar ─────────────────────────────────────── */
+.trust-level-bar {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.trust-level-bar__step {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-neutral-200);
+  transition: background-color var(--transition-base);
+}
+
+.trust-level-bar__step.is-active { background-color: var(--color-primary-500); }
+.trust-level-bar__step.is-done   { background-color: var(--color-primary-400); }
+
+/* ── Mini Score Badge ────────────────────────────────────── */
+.trust-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-body-xs-size);
+  font-weight: var(--font-weight-bold);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.trust-mini--new      { background: #F1F5F9; color: #475569; }
+.trust-mini--member   { background: #DBEAFE; color: #1D4ED8; }
+.trust-mini--trusted  { background: #DCFCE7; color: #15803D; }
+.trust-mini--verified { background: #EDE9FE; color: #6D28D9; }
+
+/* ── Hero Trust Meter (Landing Page) ────────────────────── */
+.trust-meter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 240px;
+  height: 240px;
+  margin: 0 auto;
+}
+
+.trust-meter__svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.trust-meter__arc-track {
+  fill: none;
+  stroke: rgba(255,255,255,0.15);
+  stroke-width: 12;
+  stroke-dasharray: 628;
+  stroke-linecap: round;
+}
+
+.trust-meter__arc-fill {
+  fill: none;
+  stroke: white;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-dasharray: 628;
+  stroke-dashoffset: 628;
+  transition: stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 0 12px rgba(255,255,255,0.5));
+}
+
+.trust-meter__content {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+.trust-meter__number {
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  display: block;
+}
+
+.trust-meter__sub {
+  font-size: var(--text-body-sm-size);
+  opacity: 0.8;
+  margin-top: var(--space-1);
+}

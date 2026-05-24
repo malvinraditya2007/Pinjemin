@@ -1,0 +1,204 @@
+/* ============================================================
+   PINJEMIN — BADGES
+   Status badges, trust level badges, category chips
+   ============================================================ */
+
+/* ── Base Badge ──────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.2em 0.65em;
+  font-size: var(--text-body-xs-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.5;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.badge svg, .badge .icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── Item Availability ───────────────────────────────────── */
+.badge-available {
+  background-color: #DCFCE7;
+  color: #15803D;
+}
+
+.badge-unavailable {
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-600);
+}
+
+/* ── Request Status ──────────────────────────────────────── */
+.badge-pending {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.badge-approved {
+  background-color: #DCFCE7;
+  color: #15803D;
+}
+
+.badge-rejected {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+.badge-active {
+  background-color: #DBEAFE;
+  color: #1E40AF;
+}
+
+.badge-overdue {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.7; }
+}
+
+.badge-returned {
+  background-color: #F3F4F6;
+  color: #374151;
+}
+
+.badge-cancelled {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-500);
+  text-decoration: line-through;
+}
+
+/* ── Trust Level Badges ──────────────────────────────────── */
+.badge-trust {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.15em 0.6em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-trust-new {
+  background-color: #F1F5F9;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+}
+
+.badge-trust-member {
+  background-color: #DBEAFE;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+
+.badge-trust-trusted {
+  background-color: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #BBF7D0;
+}
+
+.badge-trust-verified {
+  background-color: #EDE9FE;
+  color: #6D28D9;
+  border: 1px solid #DDD6FE;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-trust-verified::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(124,58,237,0.08), transparent);
+  animation: badge-shimmer 2s ease infinite;
+}
+
+@keyframes badge-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ── Category Chips ──────────────────────────────────────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.chip--default {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-600);
+  border-color: var(--color-neutral-200);
+}
+
+.chip--default:hover {
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-800);
+}
+
+.chip--active {
+  background-color: var(--color-primary-500);
+  color: white;
+  border-color: var(--color-primary-500);
+}
+
+.chip--active:hover {
+  background-color: var(--color-primary-600);
+}
+
+/* ── SDG / Special Badges ────────────────────────────────── */
+.badge-sdg {
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
+  color: white;
+  padding: 0.3em 0.8em;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Dot Indicator ───────────────────────────────────────── */
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-green  { background-color: var(--color-primary-500); }
+.dot-orange { background-color: var(--color-accent-500); }
+.dot-red    { background-color: var(--color-danger); }
+.dot-yellow { background-color: var(--color-warning); }
+.dot-blue   { background-color: var(--color-info); }
+.dot-gray   { background-color: var(--color-neutral-400); }
+
+/* ── Count Badge (notification bubbles) ─────────────────── */
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background-color: var(--color-accent-500);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-full);
+  line-height: 1;
+}

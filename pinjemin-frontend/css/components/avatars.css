@@ -1,0 +1,105 @@
+/* ============================================================
+   PINJEMIN — AVATARS
+   ============================================================ */
+
+.avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Sizes ───────────────────────────────────────────────── */
+.avatar--xs  { width: 24px; height: 24px; font-size: 0.6rem; }
+.avatar--sm  { width: 32px; height: 32px; font-size: 0.75rem; }
+.avatar--md  { width: 40px; height: 40px; font-size: 0.9rem; }
+.avatar--lg  { width: 56px; height: 56px; font-size: 1.2rem; }
+.avatar--xl  { width: 72px; height: 72px; font-size: 1.5rem; }
+.avatar--2xl { width: 96px; height: 96px; font-size: 2rem; }
+
+/* ── Border Variants ─────────────────────────────────────── */
+.avatar--bordered {
+  border: 2px solid var(--color-primary-200);
+}
+
+.avatar--bordered-lg {
+  border: 3px solid white;
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Trust Ring ──────────────────────────────────────────── */
+.avatar-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-ring__svg {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  transform: rotate(-90deg);
+}
+
+.avatar-ring__track {
+  fill: none;
+  stroke: var(--color-neutral-200);
+  stroke-width: 3;
+}
+
+.avatar-ring__fill {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+
+.avatar-ring--new      .avatar-ring__fill { stroke: var(--trust-low); }
+.avatar-ring--member   .avatar-ring__fill { stroke: var(--color-info); }
+.avatar-ring--trusted  .avatar-ring__fill { stroke: var(--trust-high); }
+.avatar-ring--verified .avatar-ring__fill { stroke: var(--trust-verified); }
+
+/* ── Avatar Group ────────────────────────────────────────── */
+.avatar-group {
+  display: flex;
+}
+
+.avatar-group .avatar {
+  border: 2px solid white;
+  margin-left: -8px;
+}
+
+.avatar-group .avatar:first-child {
+  margin-left: 0;
+}
+
+/* ── Online Indicator ────────────────────────────────────── */
+.avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.avatar-wrapper .avatar-online {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-success);
+  border-radius: 50%;
+  border: 2px solid white;
+}

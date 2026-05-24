@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Tambah Barang — Pinjemin</title>
+  <link rel="stylesheet" href="../css/reset.css"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components/buttons.css"/>
+  <link rel="stylesheet" href="../css/components/badges.css"/>
+  <link rel="stylesheet" href="../css/components/cards.css"/>
+  <link rel="stylesheet" href="../css/components/forms.css"/>
+  <link rel="stylesheet" href="../css/components/toasts.css"/>
+  <link rel="stylesheet" href="../css/components/sidebar.css"/>
+  <link rel="stylesheet" href="../css/components/bottomnav.css"/>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div id="app-sidebar"></div>
+  <div class="main-content">
+
+
+    <div class="page-content" style="max-width:720px">
+      <div class="page-header">
+        <h1 class="page-header__title">Tambah Barang</h1>
+        <p class="page-header__desc">Pinjamkan barangmu dan mulai bantu sesama anggota komunitas</p>
+      </div>
+      <!-- Step Indicator -->
+      <div class="step-indicator" id="step-indicator" style="margin-bottom:var(--space-8)">
+        <div class="step-indicator__item is-active" data-step="1">
+          <div class="step-indicator__dot">1</div>
+        </div>
+        <div class="step-indicator__line"></div>
+        <div class="step-indicator__item" data-step="2">
+          <div class="step-indicator__dot">2</div>
+        </div>
+        <div class="step-indicator__line"></div>
+        <div class="step-indicator__item" data-step="3">
+          <div class="step-indicator__dot">3</div>
+        </div>
+        <div class="step-indicator__line"></div>
+        <div class="step-indicator__item" data-step="4">
+          <div class="step-indicator__dot">4</div>
+        </div>
+      </div>
+
+      <!-- STEP 1: Upload Photo -->
+      <div class="card" id="step-1">
+        <div class="card__header">
+          <div>
+            <div class="text-heading-lg">📸 Langkah 1/4: Foto Barang</div>
+            <div style="font-size:var(--text-body-sm-size);color:var(--color-neutral-500);margin-top:2px">Upload hingga 5 foto. Foto pertama jadi cover.</div>
+          </div>
+        </div>
+        <div class="card__body">
+          <div id="upload-zone" style="border:2px dashed var(--color-neutral-300);border-radius:var(--radius-xl);padding:var(--space-12);text-align:center;cursor:pointer;transition:all var(--transition-fast);background:var(--color-neutral-50)" ondragover="event.preventDefault();this.style.borderColor='var(--color-primary-400)'" ondragleave="this.style.borderColor='var(--color-neutral-300)'">
+            <div style="font-size:3rem;margin-bottom:var(--space-3)">📷</div>
+            <div class="text-heading-sm" style="margin-bottom:var(--space-2)">Drag & drop foto di sini</div>
+            <div style="font-size:var(--text-body-sm-size);color:var(--color-neutral-400);margin-bottom:var(--space-5)">atau klik untuk memilih file (JPG, PNG, max 5MB)</div>
+            <input type="file" id="file-input" accept="image/*" multiple style="display:none"/>
+            <label for="file-input" class="btn btn-outline btn-md">Pilih Foto</label>
+          </div>
+          <div id="preview-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--space-3);margin-top:var(--space-4)"></div>
+          <div class="info-card" style="margin-top:var(--space-5)">
+            <div class="info-card__icon">💡</div>
+            <div class="info-card__content">
+              <div class="info-card__title">Tips foto yang baik</div>
+              <div class="info-card__text">Foto dari berbagai sudut, cahaya cukup, tampilkan kondisi sebenarnya.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card__footer" style="display:flex;justify-content:flex-end">
+          <button class="btn btn-primary btn-md btn-pill" onclick="goStep(2)">Selanjutnya <i data-lucide="arrow-right" style="width:16px;height:16px"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Details -->
+      <div class="card" id="step-2" style="display:none">
+        <div class="card__header"><div class="text-heading-lg">📋 Langkah 2/4: Detail Barang</div></div>
+        <div class="card__body">
+          <div class="form-group">
+            <label class="form-label" for="item-title">Nama Barang <span class="required">*</span></label>
+            <input type="text" class="form-input" id="item-title" placeholder="cth: Mesin Bor Bosch GSB 550" maxlength="100"/>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-top:var(--space-5)">
+            <div class="form-group">
+              <label class="form-label" for="item-cat">Kategori <span class="required">*</span></label>
+              <select class="form-select" id="item-cat">
+                <option value="">Pilih kategori...</option>
+                <option value="TOOLS">🔧 Peralatan</option>
+                <option value="ELECTRONICS">💻 Elektronik</option>
+                <option value="SPORTS">🏋️ Olahraga</option>
+                <option value="KITCHEN">🍳 Dapur</option>
+                <option value="GARDEN">🌿 Kebun</option>
+                <option value="VEHICLE">🚗 Kendaraan</option>
+                <option value="BABY_KIDS">👶 Bayi & Anak</option>
+                <option value="BOOKS_MEDIA">📚 Buku & Media</option>
+                <option value="FASHION">👗 Fashion</option>
+                <option value="OUTDOOR">⛺ Outdoor</option>
+                <option value="OTHER">📦 Lainnya</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="item-cond">Kondisi <span class="required">*</span></label>
+              <select class="form-select" id="item-cond">
+                <option value="">Pilih kondisi...</option>
+                <option value="EXCELLENT">Sangat Baik</option>
+                <option value="GOOD">Baik</option>
+                <option value="FAIR">Cukup</option>
+                <option value="NEEDS_CARE">Perlu Perhatian</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:var(--space-5)">
+            <label class="form-label" for="item-desc">Deskripsi <span class="required">*</span></label>
+            <textarea class="form-textarea" id="item-desc" rows="4" placeholder="Ceritakan tentang barangmu: merek, ukuran, kondisi detail, apa saja yang termasuk..." maxlength="500"></textarea>
+          </div>
+        </div>
+        <div class="card__footer" style="display:flex;justify-content:space-between">
+          <button class="btn btn-ghost btn-md" onclick="goStep(1)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+          <button class="btn btn-primary btn-md btn-pill" onclick="goStep(3)">Selanjutnya <i data-lucide="arrow-right" style="width:16px;height:16px"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Settings -->
+      <div class="card" id="step-3" style="display:none">
+        <div class="card__header"><div class="text-heading-lg">⚙️ Langkah 3/4: Pengaturan</div></div>
+        <div class="card__body">
+          <div class="form-group">
+            <label class="form-label" for="deposit">Jumlah Deposit (IDR)</label>
+            <div class="form-input-wrapper">
+              <span class="form-input-icon" style="font-size:0.9rem;color:var(--color-neutral-500)">Rp</span>
+              <input type="number" class="form-input" id="deposit" placeholder="0" min="0" style="padding-left:var(--space-10)"/>
+            </div>
+            <div class="form-hint">Isi 0 jika tidak ada deposit. Deposit membantu keamanan barang.</div>
+          </div>
+          <div class="form-group" style="margin-top:var(--space-5)">
+            <label class="form-label" for="guidelines">Panduan Penggunaan (opsional)</label>
+            <textarea class="form-textarea" id="guidelines" rows="3" placeholder="cth: Jangan gunakan untuk material berat. Kembalikan dalam kondisi bersih."></textarea>
+          </div>
+          <div class="form-group" style="margin-top:var(--space-5)">
+            <label class="form-label" for="item-tags">Tag (opsional)</label>
+            <input type="text" class="form-input" id="item-tags" placeholder="cth: bor, listrik, bosch (pisahkan dengan koma)"/>
+            <div class="form-hint">Tag membantu pengguna menemukan barangmu lebih mudah.</div>
+          </div>
+        </div>
+        <div class="card__footer" style="display:flex;justify-content:space-between">
+          <button class="btn btn-ghost btn-md" onclick="goStep(2)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+          <button class="btn btn-primary btn-md btn-pill" onclick="goStep(4)">Selanjutnya <i data-lucide="arrow-right" style="width:16px;height:16px"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Location + Preview -->
+      <div class="card" id="step-4" style="display:none">
+        <div class="card__header"><div class="text-heading-lg">📍 Langkah 4/4: Lokasi & Preview</div></div>
+        <div class="card__body">
+          <div class="form-group">
+            <label class="form-label" for="neighborhood">Nama Kelurahan / Area</label>
+            <input type="text" class="form-input" id="neighborhood" placeholder="cth: Menteng, Jakarta Pusat"/>
+          </div>
+          <button class="btn btn-outline btn-md" style="margin-top:var(--space-3)" onclick="detectLocation()">
+            <i data-lucide="navigation" style="width:16px;height:16px"></i>
+            Deteksi Lokasi Otomatis
+          </button>
+
+          <!-- Preview Card -->
+          <div style="margin-top:var(--space-8);padding-top:var(--space-8);border-top:1px solid var(--color-neutral-200)">
+            <div class="text-heading-md" style="margin-bottom:var(--space-4)">Preview Barangmu</div>
+            <div id="preview-card" style="max-width:280px"></div>
+          </div>
+        </div>
+        <div class="card__footer" style="display:flex;justify-content:space-between">
+          <button class="btn btn-ghost btn-md" onclick="goStep(3)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+          <button class="btn btn-accent btn-lg btn-pill" id="submit-btn">
+            <i data-lucide="check-circle" style="width:18px;height:18px"></i>
+            Daftarkan Barang!
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="app-bottom-nav"></div>
+
+<script type="module">
+import { renderAppShell } from '../js/layout.js';
+import api from '../js/api.js';
+import toast from '../js/toast.js';
+renderAppShell('item-new');
+
+window.goStep = function(n) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`step-${i}`);
+    if (el) el.style.display = i === n ? '' : 'none';
+  }
+  document.querySelectorAll('.step-indicator__item').forEach(item => {
+    const s = parseInt(item.dataset.step);
+    item.classList.toggle('is-active', s === n);
+    item.classList.toggle('is-done', s < n);
+  });
+  if (n === 4) renderPreview();
+  lucide.createIcons();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.detectLocation = function() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(() => {
+      document.getElementById('neighborhood').value = 'Menteng, Jakarta Pusat';
+      toast.success('Lokasi terdeteksi!', 'Menteng, Jakarta Pusat');
+    }, () => toast.error('Gagal deteksi lokasi', 'Izinkan akses lokasi di browser.'));
+  } else { toast.error('Tidak didukung', 'Browser tidak mendukung geolokasi.'); }
+};
+
+function renderPreview() {
+  const title = document.getElementById('item-title').value || 'Nama Barang';
+  const cat   = document.getElementById('item-cat').value;
+  const loc   = document.getElementById('neighborhood').value || 'Lokasiku';
+  const dep   = parseInt(document.getElementById('deposit').value) || 0;
+  const catEmoji = { TOOLS:'🔧',ELECTRONICS:'💻',SPORTS:'🏋️',KITCHEN:'🍳',GARDEN:'🌿',VEHICLE:'🚗',BABY_KIDS:'👶',BOOKS_MEDIA:'📚',FASHION:'👗',OUTDOOR:'⛺',OTHER:'📦' };
+  document.getElementById('preview-card').innerHTML = `
+    <div class="item-card" style="max-width:280px;pointer-events:none">
+      <div class="item-card__image-wrap">
+        <div class="item-card__placeholder"><span>${catEmoji[cat]||'📦'}</span></div>
+        <div class="item-card__availability"><span class="badge badge-available">Tersedia</span></div>
+      </div>
+      <div class="item-card__body">
+        <div class="item-card__title">${title}</div>
+        <div class="item-card__location">📍 ${loc}</div>
+        <div class="item-card__footer">
+          <span class="item-card__deposit ${dep===0?'item-card__deposit--free':''}">${dep===0?'✓ Gratis dipinjam':'Deposit: Rp '+dep.toLocaleString('id-ID')}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+let uploadedImages = [];
+
+// Compress image via canvas to keep payload size small
+function compressImage(file, maxPx = 800, quality = 0.75) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxPx || height > maxPx) {
+          if (width > height) { height = Math.round(height * maxPx / width); width = maxPx; }
+          else { width = Math.round(width * maxPx / height); height = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('file-input').addEventListener('change', async e => {
+  const grid = document.getElementById('preview-grid');
+  grid.innerHTML = '';
+  uploadedImages = [];
+  const files = [...e.target.files].slice(0, 5);
+  for (let idx = 0; idx < files.length; idx++) {
+    const compressed = await compressImage(files[idx]);
+    uploadedImages[idx] = compressed;
+    const div = document.createElement('div');
+    div.style.cssText = 'aspect-ratio:1;border-radius:var(--radius-md);overflow:hidden;position:relative;background:var(--color-neutral-100)';
+    div.innerHTML = `<img src="${compressed}" style="width:100%;height:100%;object-fit:cover"/>`;
+    grid.appendChild(div);
+  }
+});
+
+document.getElementById('submit-btn').addEventListener('click', async () => {
+  const title = document.getElementById('item-title').value;
+  const category   = document.getElementById('item-cat').value;
+  const condition  = document.getElementById('item-cond').value;
+  const description = document.getElementById('item-desc').value;
+  const depositAmount = document.getElementById('deposit').value;
+  const neighborhood = document.getElementById('neighborhood').value;
+  const tags = document.getElementById('item-tags').value;
+  const usageGuidelines = document.getElementById('guidelines').value;
+  
+  if (!title || !category || !condition || !description) { 
+    toast.error('Lengkapi data', 'Nama, kategori, kondisi, dan deskripsi wajib diisi.'); 
+    return; 
+  }
+
+  const btn = document.getElementById('submit-btn');
+  const ogText = btn.innerHTML;
+  btn.innerHTML = 'Menyimpan...';
+  btn.disabled = true;
+
+  try {
+    await api.items.create({
+      title,
+      category,
+      condition,
+      description,
+      depositAmount,
+      neighborhood,
+      tags,
+      usageGuidelines,
+      images: JSON.stringify(uploadedImages.filter(Boolean))
+    });
+    
+    toast.success('Barang berhasil didaftarkan! 🎉', `"${title}" sekarang bisa ditemukan komunitas.`);
+    setTimeout(() => location.href = 'dashboard.html', 2000);
+  } catch(e) {
+    toast.error('Gagal mendaftar', e.message);
+    btn.innerHTML = ogText;
+    btn.disabled = false;
+  }
+});
+
+lucide.createIcons();
+</script>
+</body>
+</html>

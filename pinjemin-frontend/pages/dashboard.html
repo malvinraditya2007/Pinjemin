@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Dashboard — Pinjemin</title>
+  <link rel="stylesheet" href="../css/reset.css" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components/buttons.css" />
+  <link rel="stylesheet" href="../css/components/badges.css" />
+  <link rel="stylesheet" href="../css/components/cards.css" />
+  <link rel="stylesheet" href="../css/components/navbar.css" />
+  <link rel="stylesheet" href="../css/components/sidebar.css" />
+  <link rel="stylesheet" href="../css/components/bottomnav.css" />
+  <link rel="stylesheet" href="../css/components/item-card.css" />
+  <link rel="stylesheet" href="../css/components/toasts.css" />
+  <link rel="stylesheet" href="../css/components/avatars.css" />
+  <link rel="stylesheet" href="../css/pages/dashboard.css" />
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+
+<body>
+  <div class="app-shell">
+    <div id="app-sidebar"></div>
+    <div class="main-content">
+
+
+
+      <div class="page-content" style="display:flex;gap:var(--space-8)">
+        <!-- Main Feed -->
+        <div style="flex:1;min-width:0">
+          <!-- Greeting -->
+          <div class="dashboard-greeting reveal">
+            <div class="dashboard-greeting__text" id="greeting-text">Halo, ...</div>
+            <div class="dashboard-greeting__loc">
+              <i data-lucide="map-pin" style="width:14px;height:14px"></i>
+              <span id="greeting-loc">Lokasi Anda</span>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="stats-row reveal" style="margin-bottom:var(--space-8)">
+            <div class="stat-card stat-card--blue">
+              <div class="stat-card__label">Dipinjam Aktif</div>
+              <div class="stat-card__value">1</div>
+              <div class="stat-card__sub">berjalan lancar</div>
+            </div>
+            <div class="stat-card stat-card--orange">
+              <div class="stat-card__label">Perlu Persetujuan</div>
+              <div class="stat-card__value" id="approval-count">1</div>
+              <div class="stat-card__sub">menunggu responsmu</div>
+            </div>
+            <div class="stat-card stat-card--green">
+              <div class="stat-card__label">Trust Score</div>
+              <div class="stat-card__value" id="trust-score-val">87</div>
+              <div class="stat-card__sub">Trusted Member</div>
+            </div>
+          </div>
+
+          <!-- Nearby Items -->
+          <div class="section-header reveal">
+            <div>
+              <div class="section-header__title">Tersedia di Sekitarmu</div>
+              <div class="section-header__subtitle">Barang terdekat yang bisa kamu pinjam hari ini</div>
+            </div>
+            <a href="discover.html" class="btn btn-outline btn-sm">Lihat Semua →</a>
+          </div>
+
+          <!-- Filter Chips -->
+          <div class="filter-chips reveal" style="margin-bottom:var(--space-6)" id="cat-filters">
+            <button class="chip chip--active" data-cat="">Semua</button>
+            <button class="chip chip--default" data-cat="TOOLS">🔧 Peralatan</button>
+            <button class="chip chip--default" data-cat="ELECTRONICS">💻 Elektronik</button>
+            <button class="chip chip--default" data-cat="SPORTS">🏋️ Olahraga</button>
+            <button class="chip chip--default" data-cat="OUTDOOR">⛺ Outdoor</button>
+            <button class="chip chip--default" data-cat="KITCHEN">🍳 Dapur</button>
+          </div>
+
+          <!-- Items Grid -->
+          <div class="grid grid-cols-3 grid-gap-6 reveal" id="items-grid" style="margin-bottom:var(--space-10)">
+            <!-- JS rendered -->
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="section-header reveal">
+            <div class="section-header__title">Aktivitas Terbaru</div>
+          </div>
+          <div class="card reveal">
+            <div class="card__body">
+              <div class="activity-feed" id="activity-feed">
+                <!-- JS rendered -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel -->
+        <aside class="right-panel">
+          <div class="card" style="margin-bottom:var(--space-6)">
+            <div class="card__header">
+              <span class="text-heading-sm">🏆 Top Peminjam Minggu Ini</span>
+            </div>
+            <div class="card__body card__body--sm" id="top-lenders-container">
+              <div style="text-align:center;padding:var(--space-4);color:var(--color-neutral-500);font-size:var(--text-body-sm-size)">Memuat...</div>
+            </div>
+          </div>
+
+          <div class="card"
+            style="background:linear-gradient(135deg,var(--color-primary-50),var(--color-primary-100));border-color:var(--color-primary-200)">
+            <div class="card__body">
+              <div style="font-size:1.5rem;margin-bottom:var(--space-3)">🌍</div>
+              <div class="text-heading-sm" style="color:var(--color-primary-800);margin-bottom:var(--space-2)">Dampakmu
+                Bulan Ini</div>
+              <div style="font-size:var(--text-body-sm-size);color:var(--color-primary-700)" id="impact-container">
+                <div style="text-align:center;padding:var(--space-2)">Memuat...</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+  <div id="app-bottom-nav"></div>
+
+  <script type="module">
+    import { renderAppShell } from '../js/layout.js';
+    import api from '../js/api.js';
+    import { formatRelativeTime, getCategoryInfo, getConditionLabel, formatIDR, getInitials } from '../js/utils.js';
+
+    renderAppShell('dashboard');
+
+    let user;
+    let itemsData = [];
+    let notifsData = [];
+
+    // Always reveal elements, regardless of API success
+    function revealElements() {
+      document.querySelectorAll('.reveal').forEach((el, index) => {
+        setTimeout(() => el.classList.add('visible'), 100 * index);
+      });
+    }
+
+    async function init() {
+      // Reuse promises already started by layout.js (sidebar), fall back to fresh calls
+      const appData = window._appData || {};
+      
+      // Fire all API calls in parallel for ~1s total load time
+      const [userResult, itemsResult, notifsResult, topLendersResult, impactResult] = await Promise.allSettled([
+        appData.userPromise || api.users.getMe(),
+        api.items.getAll(),
+        appData.notifsPromise || api.notifications.getAll(),
+        api.users.getTopLenders(),
+        api.users.getImpact()
+      ]);
+
+      // Handle user data
+      if (userResult.status === 'fulfilled') {
+        const user = userResult.value;
+        document.getElementById('greeting-text').textContent = `Halo, ${user.fullName.split(' ')[0]}! 👋`;
+        document.getElementById('greeting-loc').textContent = user.address || 'Indonesia';
+        document.getElementById('trust-score-val').textContent = user.trustScore;
+        const offset = 188 - (188 * user.trustScore / 100);
+        // Note: Assuming trust-ring-fill element exists for this logic
+        if (document.getElementById('trust-ring-fill')) {
+          document.getElementById('trust-ring-fill').style.strokeDashoffset = offset;
+        }
+      } else {
+        console.warn('Could not load user data', userResult.reason);
+        document.getElementById('greeting-text').textContent = `Halo! 👋`;
+      }
+
+      // Handle items data
+      if (itemsResult.status === 'fulfilled') {
+        itemsData = itemsResult.value;
+        renderGrid('');
+      } else {
+        console.warn('Could not load items', itemsResult.reason);
+        document.getElementById('items-grid').innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:var(--space-10) var(--space-4);color:var(--color-neutral-400)">
+            <div style="font-size:2.5rem;margin-bottom:var(--space-3)">📦</div>
+            <div style="font-size:var(--text-body-md-size);font-weight:600;color:var(--color-neutral-600);margin-bottom:var(--space-2)">Tidak dapat memuat barang</div>
+            <div style="font-size:var(--text-body-sm-size)">Periksa koneksi backend server kamu.</div>
+          </div>`;
+      }
+
+      // Handle notifications data
+      if (notifsResult.status === 'fulfilled') {
+        notifsData = notifsResult.value;
+        renderActivityFeed();
+      } else {
+        console.warn('Could not load notifications', notifsResult.reason);
+        document.getElementById('activity-feed').innerHTML = `<div style="color:var(--color-neutral-500);font-size:var(--text-body-sm-size);padding:var(--space-2) 0">Belum ada aktivitas.</div>`;
+      }
+
+      // Handle top lenders
+      if (topLendersResult.status === 'fulfilled') {
+        const lenders = topLendersResult.value;
+        if (lenders.length > 0) {
+          document.getElementById('top-lenders-container').innerHTML = lenders.map((l, i) => `
+            <div class="leaderboard-item">
+              <div class="leaderboard-item__rank leaderboard-item__rank--${i + 1}">${i + 1}</div>
+              <div class="leaderboard-item__info">
+                <div class="leaderboard-item__name">${l.fullName}</div>
+                <div class="leaderboard-item__sub">${l.totalLends} item dipinjamkan</div>
+              </div>
+              <div class="leaderboard-item__score">${l.trustScore}</div>
+            </div>
+          `).join('');
+        } else {
+          document.getElementById('top-lenders-container').innerHTML = '<div style="text-align:center;padding:var(--space-4);color:var(--color-neutral-500);font-size:var(--text-body-sm-size)">Belum ada peminjam</div>';
+        }
+      }
+
+      // Handle impact data
+      if (impactResult.status === 'fulfilled') {
+        const impact = impactResult.value;
+        document.getElementById('impact-container').innerHTML = `
+          <div>♻️ CO₂ dihemat: <strong>${impact.co2SavedKg} kg</strong></div>
+          <div style="margin-top:4px">💰 Uang dihemat: <strong>${formatIDR(impact.moneySavedIdr)}</strong></div>
+          <div style="margin-top:4px">🤝 Pinjaman selesai: <strong>${impact.completedBorrows}</strong></div>
+        `;
+      }
+
+      // Always animate elements into view
+      revealElements();
+    }
+    init();
+
+    function renderItemCard(item) {
+      const cat = getCategoryInfo(item.category);
+      const initials = getInitials(item.owner.fullName);
+      let images = [];
+      try { images = JSON.parse(item.images || '[]'); } catch(e) { images = []; }
+
+      const imageHtml = images.length > 0 
+        ? `<img src="${images[0]}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;" alt="${item.title}">`
+        : `<div class="item-card__placeholder">
+            <span>${cat.emoji}</span>
+            <span class="item-card__placeholder-text">${cat.label}</span>
+          </div>`;
+
+      return `
+    <a href="item-detail.html?id=${item.id}" class="item-card">
+      <div class="item-card__image-wrap">
+        ${imageHtml}
+        <div class="item-card__availability">
+          <span class="badge ${item.isAvailable ? 'badge-available' : 'badge-unavailable'}">
+            ${item.isAvailable ? 'Tersedia' : 'Dipinjam'}
+          </span>
+        </div>
+        <div class="item-card__category">
+          <span class="badge badge-available" style="background:var(--color-neutral-100);color:var(--color-neutral-600)">${cat.emoji} ${cat.label}</span>
+        </div>
+        <div class="item-card__overlay">
+          <span class="item-card__overlay-btn">Lihat Detail →</span>
+        </div>
+      </div>
+      <div class="item-card__body">
+        <div class="item-card__title">${item.title}</div>
+        <div class="item-card__condition">${getConditionLabel(item.condition)}</div>
+        <div class="item-card__owner">
+          <div class="item-card__owner-avatar">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));color:white;font-size:0.55rem;font-weight:700">${initials}</div>
+          </div>
+          <span class="item-card__owner-name">${item.owner.fullName}</span>
+        </div>
+        <div class="item-card__location">📍 ${item.neighborhood}</div>
+        <div class="item-card__footer">
+          <span class="item-card__deposit ${item.depositAmount === 0 ? 'item-card__deposit--free' : ''}">
+            ${item.depositAmount === 0 ? '✓ Gratis dipinjam' : `Deposit: ${formatIDR(item.depositAmount)}`}
+          </span>
+          <span class="btn btn-accent btn-sm btn-pill">Pinjam →</span>
+        </div>
+      </div>
+    </a>`;
+    }
+
+    let activeFilter = '';
+    function renderGrid(filter) {
+      const filtered = filter ? itemsData.filter(i => i.category === filter) : itemsData;
+      document.getElementById('items-grid').innerHTML = filtered.map(renderItemCard).join('');
+      lucide.createIcons();
+    }
+
+    document.getElementById('cat-filters').addEventListener('click', e => {
+      const btn = e.target.closest('[data-cat]');
+      if (!btn) return;
+      document.querySelectorAll('#cat-filters .chip').forEach(c => { c.className = 'chip chip--default'; });
+      btn.className = 'chip chip--active';
+      activeFilter = btn.dataset.cat;
+      renderGrid(activeFilter);
+    });
+
+    function renderActivityFeed() {
+      const icons = {
+        BORROW_REQUEST_RECEIVED: { icon: '📦', iconClass: 'icon--blue' },
+        BORROW_REQUEST_APPROVED: { icon: '✅', iconClass: 'icon--green' },
+        TRUST_SCORE_CHANGED: { icon: '⭐', iconClass: 'icon--orange' }
+      };
+
+      const activities = notifsData.slice(0, 3).map(n => {
+        const ic = icons[n.type] || { icon: '🔔', iconClass: 'icon--blue' };
+        return `
+      <div class="activity-item">
+        <div class="activity-item__icon activity-item__${ic.iconClass}">${ic.icon}</div>
+        <div class="activity-item__content">
+          <div class="activity-item__text">${n.body}</div>
+          <div class="activity-item__time">${formatRelativeTime(n.createdAt)}</div>
+        </div>
+      </div>`;
+      });
+
+      if (activities.length > 0) {
+        document.getElementById('activity-feed').innerHTML = activities.join('');
+      } else {
+        document.getElementById('activity-feed').innerHTML = `<div style="color:var(--color-neutral-500);font-size:var(--text-body-sm-size);padding:var(--space-2) 0">Belum ada aktivitas.</div>`;
+      }
+    }
+
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>

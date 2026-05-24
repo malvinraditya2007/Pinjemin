@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String         @id @default(uuid())
+  username          String         @unique
+  fullName          String
+  phone             String         @unique
+  avatarUrl         String?
+  bio               String?
+  trustScore        Int            @default(40)
+  trustLevel        String         @default("NEW") // NEW, MEMBER, TRUSTED, VERIFIED
+  totalLends        Int            @default(0)
+  totalBorrows      Int            @default(0)
+  successfulReturns Int            @default(0)
+  neighborhood      String?
+  address           String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  items             Item[]         @relation("UserItems")
+  borrowRequests    Request[]      @relation("BorrowerRequests")
+  lendRequests      Request[]      @relation("LenderRequests")
+  givenReviews      Review[]       @relation("ReviewAuthor")
+  receivedReviews   Review[]       @relation("ReviewTarget")
+  notifications     Notification[]
+}
+
+model Item {
+  id              String    @id @default(uuid())
+  title           String
+  description     String
+  category        String    // Enum-like: TOOLS, ELECTRONICS, etc.
+  condition       String    // EXCELLENT, GOOD, FAIR, NEEDS_CARE
+  images          String    // JSON string array
+  depositAmount   Int       @default(0)
+  isAvailable     Boolean   @default(true)
+  viewCount       Int       @default(0)
+  neighborhood    String
+  distance        Float?    // For mock
+  tags            String    // Comma-separated
+  usageGuidelines String?
+
+  ownerId         String
+  owner           User      @relation("UserItems", fields: [ownerId], references: [id])
+  
+  requests        Request[]
+  reviews         Review[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Request {
+  id          String   @id @default(uuid())
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, ACTIVE, RETURNED, OVERDUE, CANCELLED
+  purpose     String
+  message     String?
+  startDate   DateTime
+  endDate     DateTime
+  rejectReason String?
+
+  itemId      String
+  item        Item     @relation(fields: [itemId], references: [id])
+  
+  borrowerId  String
+  borrower    User     @relation("BorrowerRequests", fields: [borrowerId], references: [id])
+  
+  lenderId    String
+  lender      User     @relation("LenderRequests", fields: [lenderId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int      // 1-5
+  itemCond  Int?     // 1-5 (condition rating)
+  comment   String?
+  
+  authorId  String
+  author    User     @relation("ReviewAuthor", fields: [authorId], references: [id])
+  
+  targetId  String
+  target    User     @relation("ReviewTarget", fields: [targetId], references: [id])
+  
+  itemId    String?
+  item      Item?    @relation(fields: [itemId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String   // BORROW_REQUEST_RECEIVED, TRUST_SCORE_CHANGED, etc.
+  title     String
+  body      String
+  isRead    Boolean  @default(false)
+  data      String?  // JSON string
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}

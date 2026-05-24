@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Notifikasi — Pinjemin</title>
+  <link rel="stylesheet" href="../css/reset.css"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components/buttons.css"/>
+  <link rel="stylesheet" href="../css/components/badges.css"/>
+  <link rel="stylesheet" href="../css/components/cards.css"/>
+  <link rel="stylesheet" href="../css/components/sidebar.css"/>
+  <link rel="stylesheet" href="../css/components/bottomnav.css"/>
+  <link rel="stylesheet" href="../css/components/toasts.css"/>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div id="app-sidebar"></div>
+  <div class="main-content">
+    <div class="page-content">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div>
+          <h1 class="page-header__title">Notifikasi</h1>
+          <p class="page-header__desc">Pembaruan aktivitas dan informasi akunmu</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="mark-all-btn" style="margin-bottom:var(--space-1)">Tandai Semua Dibaca</button>
+      </div>
+      <div id="notif-list"></div>
+    </div>
+  </div>
+</div>
+<div id="app-bottom-nav"></div>
+
+<script type="module">
+import { renderAppShell } from '../js/layout.js';
+import api from '../js/api.js';
+import { formatRelativeTime } from '../js/utils.js';
+import toast from '../js/toast.js';
+
+renderAppShell('notifications');
+
+let notifs = [];
+const icons = {
+  BORROW_REQUEST_RECEIVED:'📦', BORROW_REQUEST_APPROVED:'✅', BORROW_REQUEST_REJECTED:'😔',
+  ITEM_RETURNED:'🎉', RATING_RECEIVED:'⭐', OVERDUE_REMINDER:'⏰',
+  TRUST_SCORE_CHANGED:'🚀', WELCOME:'👋', SYSTEM:'🔔',
+};
+
+function render() {
+  document.getElementById('notif-list').innerHTML = notifs.length ? notifs.map((n, i) => `
+    <div class="card" style="margin-bottom:var(--space-3);${n.isRead?'opacity:0.7':''}" id="notif-${i}">
+      <div class="card__body card__body--sm" style="display:flex;gap:var(--space-4);align-items:flex-start">
+        <div style="width:44px;height:44px;border-radius:var(--radius-lg);background:${n.isRead?'var(--color-neutral-100)':'var(--color-primary-50)'};display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">
+          ${icons[n.type]||'🔔'}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3)">
+            <div style="font-weight:${n.isRead?'400':'600'};font-size:var(--text-body-sm-size);color:var(--color-neutral-800)">${n.title}</div>
+            ${!n.isRead ? '<span class="dot dot-green" style="margin-top:5px;flex-shrink:0"></span>' : ''}
+          </div>
+          <div style="font-size:var(--text-body-sm-size);color:var(--color-neutral-500);margin-top:2px;line-height:1.5">${n.body}</div>
+          <div style="font-size:var(--text-body-xs-size);color:var(--color-neutral-400);margin-top:var(--space-2)">${formatRelativeTime(n.createdAt)}</div>
+        </div>
+      </div>
+    </div>`).join('') : `<div class="empty-state"><div class="empty-state__icon">🔔</div><div class="empty-state__title">Tidak ada notifikasi</div></div>`;
+}
+
+async function loadNotifs() {
+  try {
+    notifs = await api.notifications.getAll();
+    render();
+  } catch(e) {
+    console.error('Failed to load notifications', e);
+  }
+}
+
+document.getElementById('mark-all-btn').addEventListener('click', async () => {
+  try {
+    await api.notifications.markAllRead();
+    notifs.forEach(n => n.isRead = true);
+    render();
+    toast.success('Semua dibaca', 'Semua notifikasi ditandai sudah dibaca.');
+  } catch(e) {
+    toast.error('Gagal', e.message);
+  }
+});
+
+loadNotifs();
+lucide.createIcons();
+</script>
+</body>
+</html>

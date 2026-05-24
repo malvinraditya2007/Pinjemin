@@ -1,0 +1,74 @@
+/* ============================================================
+   PINJEMIN — PROFILE PAGE STYLES
+   ============================================================ */
+.profile-cover {
+  height: 200px;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-800));
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  position: relative;
+}
+.profile-header {
+  background: white;
+  border: 1px solid var(--color-neutral-200);
+  border-top: none;
+  border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+  padding: 0 var(--space-8) var(--space-8);
+  margin-bottom: var(--space-6);
+  position: relative;
+}
+.profile-header__avatar {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  background: var(--color-primary-100);
+  position: relative;
+  margin-top: -48px;
+  margin-bottom: var(--space-4);
+}
+.profile-header__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-header__identity { margin-bottom: var(--space-4); }
+.profile-header__name {
+  font-family: var(--font-display);
+  font-size: var(--text-heading-xl-size);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-neutral-900);
+  margin-bottom: var(--space-1);
+}
+.profile-header__username { font-size: var(--text-body-sm-size); color: var(--color-neutral-400); margin-bottom: var(--space-3); }
+.profile-header__bio { font-size: var(--text-body-md-size); color: var(--color-neutral-600); max-width: 560px; }
+.profile-header__meta {
+  display: flex;
+  gap: var(--space-5);
+  font-size: var(--text-body-sm-size);
+  color: var(--color-neutral-500);
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+}
+.profile-header__meta-item { display: flex; align-items: center; gap: var(--space-1); }
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--color-neutral-200);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-top: var(--space-6);
+}
+.profile-stat {
+  background: var(--color-neutral-50);
+  padding: var(--space-5);
+  text-align: center;
+}
+.profile-stat__value {
+  font-family: var(--font-display);
+  font-size: var(--text-heading-xl-size);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-neutral-900);
+}
+.profile-stat__label { font-size: var(--text-body-xs-size); color: var(--color-neutral-400); margin-top: var(--space-1); }
+@media (max-width: 640px) {
+  .profile-stats { grid-template-columns: repeat(2, 1fr); }
+  .profile-header { padding: 0 var(--space-4) var(--space-6); }
+}

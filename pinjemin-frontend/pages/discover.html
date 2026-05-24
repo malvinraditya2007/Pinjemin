@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Temukan Barang — Pinjemin</title>
+  <link rel="stylesheet" href="../css/reset.css"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components/buttons.css"/>
+  <link rel="stylesheet" href="../css/components/badges.css"/>
+  <link rel="stylesheet" href="../css/components/cards.css"/>
+  <link rel="stylesheet" href="../css/components/forms.css"/>
+  <link rel="stylesheet" href="../css/components/sidebar.css"/>
+  <link rel="stylesheet" href="../css/components/bottomnav.css"/>
+  <link rel="stylesheet" href="../css/components/item-card.css"/>
+  <link rel="stylesheet" href="../css/components/toasts.css"/>
+  <link rel="stylesheet" href="../css/pages/discover.css"/>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div id="app-sidebar"></div>
+  <div class="main-content">
+    <div class="page-content">
+      <div class="page-header">
+        <h1 class="page-header__title">Temukan Barang</h1>
+        <p class="page-header__desc">Jelajahi ribuan barang yang tersedia di komunitasmu</p>
+        <div class="search-bar">
+          <span class="search-bar__icon"><i data-lucide="search" style="width:18px;height:18px"></i></span>
+          <input type="search" class="search-bar__input" id="search-input" placeholder="Cari mesin bor, tenda, proyektor..."/>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="discover-search-bar">
+        <div style="flex:1">
+          <label class="form-label">Kategori</label>
+          <select class="form-select" id="cat-select" style="margin-top:var(--space-1)">
+            <option value="">Semua Kategori</option>
+            <option value="TOOLS">🔧 Peralatan</option>
+            <option value="ELECTRONICS">💻 Elektronik</option>
+            <option value="SPORTS">🏋️ Olahraga</option>
+            <option value="KITCHEN">🍳 Dapur</option>
+            <option value="GARDEN">🌿 Kebun</option>
+            <option value="VEHICLE">🚗 Kendaraan</option>
+            <option value="BABY_KIDS">👶 Bayi & Anak</option>
+            <option value="BOOKS_MEDIA">📚 Buku & Media</option>
+            <option value="OUTDOOR">⛺ Outdoor</option>
+            <option value="FASHION">👗 Fashion</option>
+            <option value="OTHER">📦 Lainnya</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="form-label">Kondisi</label>
+          <select class="form-select" id="cond-select" style="margin-top:var(--space-1)">
+            <option value="">Semua Kondisi</option>
+            <option value="EXCELLENT">Sangat Baik</option>
+            <option value="GOOD">Baik</option>
+            <option value="FAIR">Cukup</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="form-label">Ketersediaan</label>
+          <select class="form-select" id="avail-select" style="margin-top:var(--space-1)">
+            <option value="">Semua</option>
+            <option value="available">Tersedia saja</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="form-label">Lokasi</label>
+          <div style="position:relative;margin-top:var(--space-1)">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none">📍</span>
+            <input type="text" class="form-input" id="loc-input" placeholder="Cari lokasi..." style="padding-left:30px"/>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">&nbsp;</label>
+          <button class="btn btn-primary btn-md" id="reset-btn" style="margin-top:var(--space-1)">Reset Filter</button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="discover-results-header">
+        <div class="discover-results-count" id="results-count"></div>
+        <div class="discover-sort">
+          Urutkan:
+          <select class="form-select" id="sort-select" style="height:36px;font-size:var(--text-body-sm-size)">
+            <option value="newest">Terbaru</option>
+            <option value="views">Terpopuler</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="discover-grid" id="discover-grid"></div>
+    </div>
+  </div>
+</div>
+<div id="app-bottom-nav"></div>
+
+<script type="module">
+import { renderAppShell } from '../js/layout.js';
+import api from '../js/api.js';
+import { getCategoryInfo, getConditionLabel, formatIDR, getInitials } from '../js/utils.js';
+
+renderAppShell('discover');
+
+// Pre-select from URL params
+const params = new URLSearchParams(location.search);
+const initCat = params.get('category') || '';
+if (initCat) document.getElementById('cat-select').value = initCat;
+
+let MOCK_ITEMS = [];
+
+async function loadItems() {
+  try {
+    MOCK_ITEMS = await api.items.getAll();
+    render();
+  } catch(e) {
+    console.error('Failed to load items', e);
+  }
+}
+
+function getFiltered() {
+  const q    = document.getElementById('search-input').value.toLowerCase();
+  const cat  = document.getElementById('cat-select').value;
+  const cond = document.getElementById('cond-select').value;
+  const avail= document.getElementById('avail-select').value;
+  const loc  = document.getElementById('loc-input').value.toLowerCase();
+  const sort = document.getElementById('sort-select').value;
+  let items = [...MOCK_ITEMS];
+  if (q)     items = items.filter(i => i.title.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
+  if (cat)   items = items.filter(i => i.category === cat);
+  if (cond)  items = items.filter(i => i.condition === cond);
+  if (avail === 'available') items = items.filter(i => i.isAvailable);
+  if (loc)   items = items.filter(i => (i.neighborhood || '').toLowerCase().includes(loc));
+  if (sort === 'views') items.sort((a,b) => b.viewCount - a.viewCount);
+  return items;
+}
+
+function render() {
+  const items = getFiltered();
+  document.getElementById('results-count').innerHTML = `Menampilkan <strong>${items.length}</strong> barang`;
+  document.getElementById('discover-grid').innerHTML = items.length ? items.map(item => {
+    const cat = getCategoryInfo(item.category);
+    const initials = getInitials(item.owner.fullName);
+    let images = [];
+    try { images = JSON.parse(item.images || '[]'); } catch(e) { images = []; }
+    const imgHTML = images.length
+      ? `<img src="${images[0]}" style="width:100%;height:100%;object-fit:cover" alt="${item.title}"/>`
+      : `<div class="item-card__placeholder"><span>${cat.emoji}</span></div>`;
+    return `
+      <a href="item-detail.html?id=${item.id}" class="item-card">
+        <div class="item-card__image-wrap">
+          ${imgHTML}
+          <div class="item-card__availability">
+            <span class="badge ${item.isAvailable ? 'badge-available' : 'badge-unavailable'}">${item.isAvailable ? 'Tersedia' : 'Dipinjam'}</span>
+          </div>
+          <div class="item-card__overlay"><span class="item-card__overlay-btn">Lihat Detail →</span></div>
+        </div>
+        <div class="item-card__body">
+          <div class="item-card__title">${item.title}</div>
+          <div class="item-card__condition">${getConditionLabel(item.condition)} · 👁 ${item.viewCount}</div>
+          <div class="item-card__owner">
+            <div class="item-card__owner-avatar">
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));color:white;font-size:0.55rem;font-weight:700">${initials}</div>
+            </div>
+            <span class="item-card__owner-name">${item.owner.fullName}</span>
+          </div>
+          <div class="item-card__location">📍 ${item.neighborhood}</div>
+          <div class="item-card__footer">
+            <span class="item-card__deposit ${item.depositAmount === 0 ? 'item-card__deposit--free' : ''}">${item.depositAmount === 0 ? '✓ Gratis' : `Deposit: ${formatIDR(item.depositAmount)}`}</span>
+            <span class="btn btn-accent btn-sm btn-pill">Pinjam →</span>
+          </div>
+        </div>
+      </a>`;
+  }).join('') : `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state__icon">🔍</div><div class="empty-state__title">Tidak ada barang ditemukan</div><div class="empty-state__text">Coba ubah filter atau kata kunci pencarianmu</div></div>`;
+  lucide.createIcons();
+}
+
+['search-input','cat-select','cond-select','avail-select','sort-select'].forEach(id => {
+  document.getElementById(id).addEventListener(id === 'search-input' ? 'input' : 'change', render);
+});
+document.getElementById('loc-input').addEventListener('input', render);
+document.getElementById('reset-btn').addEventListener('click', () => {
+  ['cat-select','cond-select','avail-select'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('search-input').value = '';
+  document.getElementById('loc-input').value = '';
+  render();
+});
+render();
+loadItems();
+lucide.createIcons();
+</script>
+</body>
+</html>

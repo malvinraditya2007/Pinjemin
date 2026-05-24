@@ -1,0 +1,135 @@
+/* ============================================================
+   PINJEMIN — BOTTOM NAV (Mobile Navigation)
+   ============================================================ */
+
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky);
+  background-color: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--color-neutral-200);
+  padding: var(--space-2) var(--space-4) env(safe-area-inset-bottom, var(--space-2));
+  height: 72px;
+  align-items: stretch;
+  justify-content: space-around;
+}
+
+@media (max-width: 1023px) {
+  .bottom-nav { display: flex; }
+}
+
+/* ── Nav Items ───────────────────────────────────────────── */
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--color-neutral-400);
+  cursor: pointer;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+  min-width: 52px;
+  border: none;
+  background: none;
+  position: relative;
+  flex: 1;
+}
+
+.bottom-nav__item:hover {
+  color: var(--color-neutral-700);
+  background-color: var(--color-neutral-100);
+}
+
+.bottom-nav__item.is-active {
+  color: var(--color-primary-600);
+}
+
+.bottom-nav__icon {
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+
+.bottom-nav__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.bottom-nav__label {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+}
+
+/* ── Active Indicator ────────────────────────────────────── */
+.bottom-nav__item.is-active .bottom-nav__icon::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--color-primary-500);
+}
+
+/* ── FAB (Center Add Button) ─────────────────────────────── */
+.bottom-nav__fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-600));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-glow-orange), var(--shadow-lg);
+  cursor: pointer;
+  border: none;
+  transition: transform var(--transition-spring), box-shadow var(--transition-fast);
+  align-self: center;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  flex: 0 0 52px;
+}
+
+.bottom-nav__fab:hover {
+  transform: scale(1.1) translateY(-2px);
+}
+
+.bottom-nav__fab:active {
+  transform: scale(0.95);
+}
+
+.bottom-nav__fab svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ── Notification Badge ──────────────────────────────────── */
+.bottom-nav__badge {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  min-width: 16px;
+  height: 16px;
+  background-color: var(--color-accent-500);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 2px solid white;
+}

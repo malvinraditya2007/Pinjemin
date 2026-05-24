@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Permintaanku — Pinjemin</title>
+  <link rel="stylesheet" href="../css/reset.css"/>
+  <link rel="stylesheet" href="../css/tokens.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/layout.css"/>
+  <link rel="stylesheet" href="../css/components/buttons.css"/>
+  <link rel="stylesheet" href="../css/components/badges.css"/>
+  <link rel="stylesheet" href="../css/components/cards.css"/>
+  <link rel="stylesheet" href="../css/components/sidebar.css"/>
+  <link rel="stylesheet" href="../css/components/bottomnav.css"/>
+  <link rel="stylesheet" href="../css/components/request-card.css"/>
+  <link rel="stylesheet" href="../css/components/toasts.css"/>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div id="app-sidebar"></div>
+  <div class="main-content">
+
+
+    <div class="page-content">
+      <div class="page-header">
+        <h1 class="page-header__title">Permintaan Pinjam</h1>
+        <p class="page-header__desc">Daftar barang yang kamu minta untuk dipinjam</p>
+      </div>
+
+      <div class="tab-bar" id="tab-bar" style="margin-bottom:var(--space-6)">
+        <div class="tab-bar__item is-active" data-filter="">Semua</div>
+        <div class="tab-bar__item" data-filter="PENDING">Menunggu</div>
+        <div class="tab-bar__item" data-filter="APPROVED">Aktif</div>
+        <div class="tab-bar__item" data-filter="RETURNED">Selesai</div>
+        <div class="tab-bar__item" data-filter="REJECTED">Ditolak</div>
+      </div>
+
+      <div id="requests-list"></div>
+    </div>
+  </div>
+</div>
+<div id="app-bottom-nav"></div>
+
+<script type="module">
+import { renderAppShell } from '../js/layout.js';
+import api from '../js/api.js';
+import { formatDateRange, formatRelativeTime, getStatusBadge, getCategoryInfo, getInitials } from '../js/utils.js';
+import toast from '../js/toast.js';
+
+renderAppShell('requests');
+
+let requests = [];
+let activeFilter = '';
+
+async function loadRequests() {
+  try {
+    requests = await api.requests.getSent();
+    render();
+  } catch(e) {
+    console.error('Failed to load requests', e);
+  }
+}
+
+function render() {
+  const list = activeFilter ? requests.filter(r => r.status === activeFilter) : requests;
+  const el = document.getElementById('requests-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state__icon">📭</div><div class="empty-state__title">Belum ada permintaan</div><div class="empty-state__text">Mulai dengan mencari barang dan mengajukan pinjaman</div><a href="discover.html" class="btn btn-primary btn-md btn-pill" style="margin-top:var(--space-4)">Temukan Barang</a></div>`;
+    return;
+  }
+  el.innerHTML = list.map(req => {
+    const status = getStatusBadge(req.status);
+    const cat = getCategoryInfo(req.item.category);
+    const ownerInitials = getInitials(req.lender.fullName);
+    return `
+    <div class="request-card request-card--${req.status.toLowerCase()}" style="margin-bottom:var(--space-4)">
+      <div class="request-card__avatar-wrap">
+        <div class="avatar avatar--md">
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));color:white;font-weight:700">${ownerInitials}</div>
+        </div>
+      </div>
+      <div class="request-card__content" style="flex:1">
+        <div class="request-card__headline">
+          Meminjam <strong>${req.item.title}</strong> dari <strong>${req.lender.fullName}</strong>
+        </div>
+        <div class="request-card__dates">
+          📅 ${formatDateRange(req.startDate, req.endDate)}
+          &nbsp;·&nbsp; Diajukan ${formatRelativeTime(req.createdAt)}
+        </div>
+        <div class="request-card__purpose">"${req.purpose}"</div>
+        <a href="item-detail.html?id=${req.item.id}" class="request-card__item-thumb">
+          <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--color-primary-100);display:flex;align-items:center;justify-content:center;font-size:1.5rem">${cat.emoji}</div>
+          <span class="request-card__item-name">${req.item.title}</span>
+        </a>
+      </div>
+      <div class="request-card__actions">
+        <span class="badge ${status.class}">${status.label}</span>
+        ${req.status === 'PENDING' ? `<button class="btn btn-danger-outline btn-sm" onclick="cancelReq('${req.id}')">Batalkan</button>` : ''}
+        ${req.status === 'RETURNED' ? `<a href="rate-review.html?req=${req.id}" class="btn btn-primary btn-sm btn-pill">⭐ Beri Rating</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+window.cancelReq = async (id) => { 
+  if(!confirm('Yakin ingin membatalkan permintaan ini?')) return;
+  try {
+    await api.requests.updateStatus(id, 'CANCELLED');
+    toast.warning('Permintaan dibatalkan', 'Permintaan pinjam telah dibatalkan.'); 
+    loadRequests();
+  } catch(e) {
+    toast.error('Gagal', e.message);
+  }
+};
+
+document.getElementById('tab-bar').addEventListener('click', e => {
+  const tab = e.target.closest('[data-filter]');
+  if (!tab) return;
+  document.querySelectorAll('#tab-bar .tab-bar__item').forEach(t => t.classList.remove('is-active'));
+  tab.classList.add('is-active');
+  activeFilter = tab.dataset.filter;
+  render();
+});
+
+loadRequests();
+lucide.createIcons();
+</script>
+</body>
+</html>

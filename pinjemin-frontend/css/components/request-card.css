@@ -1,0 +1,185 @@
+/* ============================================================
+   PINJEMIN — REQUEST CARD
+   Borrow request cards for /requests and /approvals
+   ============================================================ */
+
+.request-card {
+  background-color: var(--color-neutral-0);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-neutral-200);
+  box-shadow: var(--shadow-xs);
+  padding: var(--space-5);
+  display: flex;
+  gap: var(--space-4);
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
+  text-decoration: none;
+  color: inherit;
+}
+
+.request-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-neutral-300);
+}
+
+/* ── Pending card highlight ──────────────────────────────── */
+.request-card--pending {
+  border-color: var(--color-warning);
+  background-color: #FFFBF0;
+}
+
+/* ── Active card ─────────────────────────────────────────── */
+.request-card--active {
+  border-color: var(--color-info);
+  background-color: #F0F6FF;
+}
+
+/* ── Overdue card ────────────────────────────────────────── */
+.request-card--overdue {
+  border-color: var(--color-danger);
+  background-color: #FFF5F5;
+}
+
+/* ── Left (Avatar) ───────────────────────────────────────── */
+.request-card__avatar-wrap {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Center (Content) ────────────────────────────────────── */
+.request-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.request-card__headline {
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-800);
+  margin-bottom: var(--space-1);
+  line-height: 1.4;
+}
+
+.request-card__headline strong {
+  color: var(--color-neutral-900);
+}
+
+.request-card__dates {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body-xs-size);
+  color: var(--color-neutral-500);
+  margin-bottom: var(--space-2);
+}
+
+.request-card__purpose {
+  font-size: var(--text-body-sm-size);
+  color: var(--color-neutral-600);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.request-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-body-xs-size);
+  color: var(--color-neutral-400);
+  flex-wrap: wrap;
+}
+
+.request-card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* ── Right (Actions) ─────────────────────────────────────── */
+.request-card__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  min-width: 110px;
+}
+
+.request-card__action-row {
+  display: flex;
+  gap: var(--space-2);
+  flex-direction: column;
+}
+
+/* ── Reject inline form ──────────────────────────────────── */
+.request-card__reject-form {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-neutral-200);
+  display: none;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.request-card__reject-form.is-open {
+  display: flex;
+}
+
+/* ── Item Thumbnail ──────────────────────────────────────── */
+.request-card__item-thumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-neutral-50);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--transition-fast);
+}
+
+.request-card__item-thumb:hover {
+  background-color: var(--color-neutral-100);
+}
+
+.request-card__item-thumb img {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  flex-shrink: 0;
+  background-color: var(--color-neutral-200);
+}
+
+.request-card__item-name {
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-800);
+  line-height: 1.3;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .request-card {
+    flex-direction: column;
+  }
+
+  .request-card__avatar-wrap {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .request-card__actions {
+    flex-direction: row;
+    min-width: auto;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}

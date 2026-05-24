@@ -1,0 +1,233 @@
+/* ============================================================
+   PINJEMIN — BUTTONS
+   All button variants, sizes, and states
+   ============================================================ */
+
+/* ── Base Button ─────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-body-sm-size);
+  line-height: 1;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled,
+.btn.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn.is-loading {
+  pointer-events: none;
+}
+
+.btn.is-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Sizes ───────────────────────────────────────────────── */
+.btn-sm {
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-body-xs-size);
+  border-radius: var(--radius-md);
+}
+
+.btn-md {
+  height: 40px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+}
+
+.btn-lg {
+  height: 48px;
+  padding: 0 var(--space-6);
+  font-size: var(--text-body-md-size);
+  border-radius: var(--radius-lg);
+}
+
+.btn-xl {
+  height: 56px;
+  padding: 0 var(--space-8);
+  font-size: var(--text-body-lg-size);
+  border-radius: var(--radius-lg);
+}
+
+/* ── Shape Modifiers ─────────────────────────────────────── */
+.btn-pill   { border-radius: var(--radius-full); }
+.btn-rounded { border-radius: var(--radius-md); }
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--radius-md);
+}
+.btn-icon.btn-sm { width: 32px; height: 32px; }
+.btn-icon.btn-lg { width: 48px; height: 48px; }
+
+/* ── Primary Variant ─────────────────────────────────────── */
+.btn-primary {
+  background-color: var(--color-primary-500);
+  color: var(--color-neutral-0);
+  border-color: var(--color-primary-500);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  box-shadow: var(--shadow-glow-green);
+}
+
+.btn-primary:active {
+  background-color: var(--color-primary-700);
+  border-color: var(--color-primary-700);
+}
+
+/* ── Accent Variant (Main CTA) ───────────────────────────── */
+.btn-accent {
+  background-color: var(--color-accent-500);
+  color: var(--color-neutral-0);
+  border-color: var(--color-accent-500);
+}
+
+.btn-accent:hover {
+  background-color: var(--color-accent-600);
+  border-color: var(--color-accent-600);
+  box-shadow: var(--shadow-glow-orange);
+}
+
+.btn-accent:active {
+  background-color: var(--color-accent-600);
+}
+
+/* ── Outline Variant ─────────────────────────────────────── */
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-primary-600);
+  border-color: var(--color-primary-400);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-500);
+  color: var(--color-primary-700);
+}
+
+/* ── Outline Neutral ─────────────────────────────────────── */
+.btn-outline-neutral {
+  background-color: transparent;
+  color: var(--color-neutral-700);
+  border-color: var(--color-neutral-300);
+}
+
+.btn-outline-neutral:hover {
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-neutral-400);
+}
+
+/* ── Danger Variant ──────────────────────────────────────── */
+.btn-danger {
+  background-color: var(--color-danger);
+  color: var(--color-neutral-0);
+  border-color: var(--color-danger);
+}
+
+.btn-danger:hover {
+  background-color: #DC2626;
+  border-color: #DC2626;
+  box-shadow: 0 0 20px rgba(239,68,68,0.3);
+}
+
+/* ── Danger Outline ──────────────────────────────────────── */
+.btn-danger-outline {
+  background-color: transparent;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-danger-outline:hover {
+  background-color: #FEF2F2;
+}
+
+/* ── Ghost Variant ───────────────────────────────────────── */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-neutral-600);
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-800);
+}
+
+/* ── White Variant (on dark bg) ──────────────────────────── */
+.btn-white {
+  background-color: var(--color-neutral-0);
+  color: var(--color-primary-700);
+  border-color: var(--color-neutral-0);
+}
+
+.btn-white:hover {
+  background-color: var(--color-primary-50);
+}
+
+/* ── Full Width ──────────────────────────────────────────── */
+.btn-full { width: 100%; }
+
+/* ── Button Group ────────────────────────────────────────── */
+.btn-group {
+  display: inline-flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Icon inside button ──────────────────────────────────── */
+.btn svg,
+.btn .icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.btn-lg svg,
+.btn-lg .icon,
+.btn-xl svg,
+.btn-xl .icon {
+  width: 20px;
+  height: 20px;
+}
