@@ -21,7 +21,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cd pinjemin-backend
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Build Docker Image
         run: |
