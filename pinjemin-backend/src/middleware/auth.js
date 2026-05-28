@@ -1,9 +1,12 @@
 const prisma = require('../config/prisma');
+const jwt = require('jsonwebtoken');
 
 /**
  * Mock Auth Middleware
- * Reads the `x-user-id` header to simulate a logged-in user.
- * Falls back to testing user if header isn't provided (for easy local dev).
+ * Accepts either:
+ *   1. A valid JWT Bearer token (Authorization header) — for real registered users
+ *   2. An `x-user-id` header — for legacy/dev mock auth
+ * Falls back to first DB user if neither is provided (for easy local dev).
  * Uses a short-lived in-memory cache to avoid a DB round-trip on every request.
  */
 
@@ -17,6 +20,17 @@ const CACHE_TTL_MS = 30_000; // 30 seconds
 const mockAuth = async (req, res, next) => {
   try {
     let userId = req.headers['x-user-id'];
+
+    // ── JWT token takes precedence over x-user-id ───────────
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ') && process.env.JWT_SECRET) {
+      try {
+        const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+        userId = decoded.id;
+      } catch (e) {
+        // Invalid token — fall through to x-user-id / default
+      }
+    }
 
     if (!userId) {
       // For local development, if no header is provided, use the first user.

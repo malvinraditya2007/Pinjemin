@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Pinjemin</title>
+  <meta name="description" content="Masuk ke akun Pinjemin dan mulai meminjam atau meminjamkan barang di komunitasmu." />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/reset.css" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components/buttons.css" />
+  <link rel="stylesheet" href="../css/components/forms.css" />
+  <link rel="stylesheet" href="../css/pages/auth.css" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+
+<body>
+  <div class="auth-page">
+
+    <!-- ── Left Panel ───────────────────────────────────── -->
+    <div class="auth-left">
+      <div class="auth-left__content">
+        <a href="../index.html" class="auth-left__logo">
+          <div class="auth-left__logo-mark">P</div>
+          <span class="auth-left__logo-text">Pinjemin</span>
+        </a>
+
+        <h1 class="auth-left__tagline">
+          Selamat datang<br />
+          kembali ke<br />
+          <span class="highlight">komunitas.</span>
+        </h1>
+        <p class="auth-left__sub">
+          Masuk dan lanjutkan berbagi. Ribuan barang menunggumu di komunitas sekitar.
+        </p>
+
+        <div class="auth-features">
+          <div class="auth-feature">
+            <div class="auth-feature__icon">🔐</div>
+            <span>Login aman dengan enkripsi penuh</span>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature__icon">⚡</div>
+            <span>Akses langsung ke semua fitur platform</span>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature__icon">🌱</div>
+            <span>Pantau trust score dan riwayat pinjammu</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Right Panel (Form) ───────────────────────────── -->
+    <div class="auth-right">
+      <div class="auth-card">
+
+        <!-- Mobile logo -->
+        <a href="../index.html" class="auth-mobile-logo">
+          <div class="auth-mobile-logo__mark">P</div>
+          <span class="auth-mobile-logo__text">Pinjemin</span>
+        </a>
+
+        <!-- Header -->
+        <h2 class="auth-card__title">Masuk</h2>
+        <p class="auth-card__sub">Belum punya akun? <a href="register.html">Daftar di sini</a></p>
+
+        <!-- Alert -->
+        <div class="auth-alert auth-alert--error" id="login-error" role="alert">
+          <span class="auth-alert__icon">❌</span>
+          <span id="login-error-msg">Terjadi kesalahan.</span>
+        </div>
+        <div class="auth-alert auth-alert--success" id="login-success" role="status">
+          <span class="auth-alert__icon">✅</span>
+          <span id="login-success-msg">Login berhasil! Mengalihkan...</span>
+        </div>
+
+        <!-- Form -->
+        <form class="auth-form" id="login-form" novalidate autocomplete="on">
+
+          <!-- Username -->
+          <div class="form-group">
+            <label class="form-label" for="login-username">
+              Username <span class="required">*</span>
+            </label>
+            <div class="form-input-wrapper">
+              <span class="form-input-icon">
+                <i data-lucide="user" style="width:18px;height:18px"></i>
+              </span>
+              <input
+                class="form-input"
+                type="text"
+                id="login-username"
+                name="username"
+                placeholder="username kamu"
+                autocomplete="username"
+                required
+              />
+            </div>
+            <span class="form-error" id="login-username-error" style="display:none"></span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label class="form-label" for="login-password">
+              Password <span class="required">*</span>
+            </label>
+            <div class="auth-input-wrapper">
+              <input
+                class="form-input"
+                type="password"
+                id="login-password"
+                name="password"
+                placeholder="Masukkan password"
+                autocomplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                class="auth-password-toggle"
+                id="toggle-login-pw"
+                aria-label="Tampilkan/sembunyikan password"
+              >
+                <i data-lucide="eye" style="width:18px;height:18px" id="toggle-login-pw-icon"></i>
+              </button>
+            </div>
+            <span class="form-error" id="login-password-error" style="display:none"></span>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="auth-submit" id="login-btn">
+            Masuk
+          </button>
+        </form>
+
+        <div class="auth-divider">atau</div>
+
+        <div class="auth-footer">
+          Belum punya akun?
+          <a href="register.html">Daftar sekarang</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { saveSession, isLoggedIn } from '../js/auth.js';
+
+    const API_BASE = 'http://localhost:3000/v1';
+
+    // If already logged in, skip login page
+    if (isLoggedIn()) {
+      window.location.replace('dashboard.html');
+    }
+
+    // ── Init Lucide icons ────────────────────────────────────
+    lucide.createIcons();
+
+    // ── Password visibility toggle ───────────────────────────
+    const pwInput = document.getElementById('login-password');
+    const toggleBtn = document.getElementById('toggle-login-pw');
+    const toggleIcon = document.getElementById('toggle-login-pw-icon');
+
+    toggleBtn.addEventListener('click', () => {
+      const isHidden = pwInput.type === 'password';
+      pwInput.type = isHidden ? 'text' : 'password';
+      toggleIcon.setAttribute('data-lucide', isHidden ? 'eye-off' : 'eye');
+      lucide.createIcons();
+    });
+
+    // ── Helper: show/hide alerts ─────────────────────────────
+    function showError(msg) {
+      document.getElementById('login-error-msg').textContent = msg;
+      document.getElementById('login-error').classList.add('is-visible');
+      document.getElementById('login-success').classList.remove('is-visible');
+    }
+
+    function showSuccess(msg) {
+      document.getElementById('login-success-msg').textContent = msg;
+      document.getElementById('login-success').classList.add('is-visible');
+      document.getElementById('login-error').classList.remove('is-visible');
+    }
+
+    function clearAlerts() {
+      document.getElementById('login-error').classList.remove('is-visible');
+      document.getElementById('login-success').classList.remove('is-visible');
+    }
+
+    function setFieldError(id, msg) {
+      const el = document.getElementById(id);
+      if (msg) {
+        el.textContent = msg;
+        el.style.display = 'flex';
+        document.getElementById(id.replace('-error', '')).classList.add('is-error');
+      } else {
+        el.style.display = 'none';
+        document.getElementById(id.replace('-error', '')).classList.remove('is-error');
+      }
+    }
+
+    // ── Form submit ──────────────────────────────────────────
+    const form = document.getElementById('login-form');
+    const btn  = document.getElementById('login-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearAlerts();
+
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      // Client-side validation
+      let hasError = false;
+      if (!username) {
+        setFieldError('login-username-error', 'Username wajib diisi.');
+        hasError = true;
+      } else {
+        setFieldError('login-username-error', '');
+      }
+      if (!password) {
+        setFieldError('login-password-error', 'Password wajib diisi.');
+        hasError = true;
+      } else {
+        setFieldError('login-password-error', '');
+      }
+      if (hasError) return;
+
+      // Submit to API
+      btn.classList.add('is-loading');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          saveSession(data.token, data.user);
+          showSuccess('Login berhasil! Mengalihkan ke dashboard...');
+          setTimeout(() => {
+            window.location.replace('dashboard.html');
+          }, 1200);
+        } else {
+          showError(data.message || 'Username atau password salah.');
+          btn.classList.remove('is-loading');
+          btn.disabled = false;
+        }
+      } catch (err) {
+        showError('Tidak dapat terhubung ke server. Pastikan backend berjalan.');
+        btn.classList.remove('is-loading');
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+
+</html>

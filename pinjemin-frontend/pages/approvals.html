@@ -1,83 +1,87 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Persetujuan — Pinjemin</title>
-  <link rel="stylesheet" href="../css/reset.css"/>
-  <link rel="stylesheet" href="../css/tokens.css"/>
-  <link rel="stylesheet" href="../css/base.css"/>
-  <link rel="stylesheet" href="../css/layout.css"/>
-  <link rel="stylesheet" href="../css/components/buttons.css"/>
-  <link rel="stylesheet" href="../css/components/badges.css"/>
-  <link rel="stylesheet" href="../css/components/cards.css"/>
-  <link rel="stylesheet" href="../css/components/forms.css"/>
-  <link rel="stylesheet" href="../css/components/sidebar.css"/>
-  <link rel="stylesheet" href="../css/components/bottomnav.css"/>
-  <link rel="stylesheet" href="../css/components/request-card.css"/>
-  <link rel="stylesheet" href="../css/components/toasts.css"/>
-  <link rel="stylesheet" href="../css/components/avatars.css"/>
+  <link rel="stylesheet" href="../css/reset.css" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components/buttons.css" />
+  <link rel="stylesheet" href="../css/components/badges.css" />
+  <link rel="stylesheet" href="../css/components/cards.css" />
+  <link rel="stylesheet" href="../css/components/forms.css" />
+  <link rel="stylesheet" href="../css/components/sidebar.css" />
+  <link rel="stylesheet" href="../css/components/bottomnav.css" />
+  <link rel="stylesheet" href="../css/components/request-card.css" />
+  <link rel="stylesheet" href="../css/components/toasts.css" />
+  <link rel="stylesheet" href="../css/components/avatars.css" />
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 </head>
+
 <body>
-<div class="app-shell">
-  <div id="app-sidebar"></div>
-  <div class="main-content">
+  <div class="app-shell">
+    <div id="app-sidebar"></div>
+    <div class="main-content">
 
 
-    <div class="page-content">
-      <div class="page-header">
-        <h1 class="page-header__title">Persetujuan <span class="count-badge" id="pending-badge">1</span></h1>
-        <p class="page-header__desc">Permintaan pinjam untuk barang-barang milikmu</p>
+      <div class="page-content">
+        <div class="page-header">
+          <h1 class="page-header__title">Persetujuan</h1>
+          <p class="page-header__desc">Permintaan pinjam untuk barang-barang milikmu</p>
+        </div>
+
+        <div class="tab-bar" id="tab-bar" style="margin-bottom:var(--space-6)">
+          <div class="tab-bar__item is-active" data-filter="">Semua</div>
+          <div class="tab-bar__item" data-filter="PENDING">Menunggu</div>
+          <div class="tab-bar__item" data-filter="APPROVED">Aktif</div>
+          <div class="tab-bar__item" data-filter="RETURNED">Selesai</div>
+        </div>
+
+        <div id="approvals-list"></div>
       </div>
-
-      <div class="tab-bar" id="tab-bar" style="margin-bottom:var(--space-6)">
-        <div class="tab-bar__item is-active" data-filter="">Semua</div>
-        <div class="tab-bar__item" data-filter="PENDING">Menunggu</div>
-        <div class="tab-bar__item" data-filter="APPROVED">Aktif</div>
-        <div class="tab-bar__item" data-filter="RETURNED">Selesai</div>
-      </div>
-
-      <div id="approvals-list"></div>
     </div>
   </div>
-</div>
-<div id="app-bottom-nav"></div>
+  <div id="app-bottom-nav"></div>
 
-<script type="module">
-import { renderAppShell } from '../js/layout.js';
-import api from '../js/api.js';
-import { formatDateRange, formatRelativeTime, getStatusBadge, getCategoryInfo, getTrustLevel, getInitials } from '../js/utils.js';
-import toast from '../js/toast.js';
+  <script type="module">
+    import { renderAppShell } from '../js/layout.js';
+    import { requireLogin } from '../js/auth.js';
+    requireLogin();
+    import api from '../js/api.js';
+    import { formatDateRange, formatRelativeTime, getStatusBadge, getCategoryInfo, getTrustLevel, getInitials } from '../js/utils.js';
+    import toast from '../js/toast.js';
 
-renderAppShell('approvals');
+    renderAppShell('approvals');
 
-let approvals = [];
-let activeFilter = '';
+    let approvals = [];
+    let activeFilter = '';
 
-async function loadApprovals() {
-  try {
-    approvals = await api.requests.getReceived();
-    document.getElementById('pending-badge').textContent = approvals.filter(r => r.status === 'PENDING').length;
-    render();
-  } catch(e) {
-    console.error('Failed to load approvals', e);
-  }
-}
+    async function loadApprovals() {
+      try {
+        approvals = await api.requests.getReceived();
+        document.getElementById('pending-badge').textContent = approvals.filter(r => r.status === 'PENDING').length;
+        render();
+      } catch (e) {
+        console.error('Failed to load approvals', e);
+      }
+    }
 
-function render() {
-  const list = activeFilter ? approvals.filter(r => r.status === activeFilter) : approvals;
-  const el = document.getElementById('approvals-list');
-  if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state__icon">📬</div><div class="empty-state__title">Tidak ada permintaan</div><div class="empty-state__text">Belum ada yang meminta meminjam barangmu</div></div>`;
-    return;
-  }
-  el.innerHTML = list.map(req => {
-    const status = getStatusBadge(req.status);
-    const trust  = getTrustLevel(req.borrower.trustScore);
-    const cat    = getCategoryInfo(req.item.category);
-    const initials = getInitials(req.borrower.fullName);
-    return `
+    function render() {
+      const list = activeFilter ? approvals.filter(r => r.status === activeFilter) : approvals;
+      const el = document.getElementById('approvals-list');
+      if (!list.length) {
+        el.innerHTML = `<div class="empty-state"><div class="empty-state__icon">📬</div><div class="empty-state__title">Tidak ada permintaan</div><div class="empty-state__text">Belum ada yang meminta meminjam barangmu</div></div>`;
+        return;
+      }
+      el.innerHTML = list.map(req => {
+        const status = getStatusBadge(req.status);
+        const trust = getTrustLevel(req.borrower.trustScore);
+        const cat = getCategoryInfo(req.item.category);
+        const initials = getInitials(req.borrower.fullName);
+        return `
     <div class="card" style="margin-bottom:var(--space-4)" id="card-${req.id}">
       <div class="card__body">
         <div style="display:flex;gap:var(--space-4)">
@@ -144,49 +148,50 @@ function render() {
         </div>
       </div>
     </div>`;
-  }).join('');
-  lucide.createIcons();
-}
+      }).join('');
+      lucide.createIcons();
+    }
 
-window.approveReq = async (id) => {
-  try {
-    await api.requests.updateStatus(id, 'APPROVED');
-    toast.success('Permintaan disetujui! ✅', 'Peminjam akan mendapat notifikasi.');
+    window.approveReq = async (id) => {
+      try {
+        await api.requests.updateStatus(id, 'APPROVED');
+        toast.success('Permintaan disetujui! ✅', 'Peminjam akan mendapat notifikasi.');
+        loadApprovals();
+      } catch (e) {
+        toast.error('Gagal', e.message);
+      }
+    };
+
+    window.toggleReject = (id) => {
+      const form = document.getElementById(`reject-form-${id}`);
+      form.classList.toggle('is-open');
+    };
+
+    window.rejectReq = async (id) => {
+      const reason = document.getElementById(`reject-reason-${id}`).value;
+      if (!reason) { toast.error('Pilih alasan', 'Silakan pilih alasan penolakan.'); return; }
+
+      try {
+        await api.requests.updateStatus(id, 'REJECTED', reason);
+        toast.warning('Permintaan ditolak', 'Peminjam akan mendapat notifikasi.');
+        loadApprovals();
+      } catch (e) {
+        toast.error('Gagal', e.message);
+      }
+    };
+
+    document.getElementById('tab-bar').addEventListener('click', e => {
+      const tab = e.target.closest('[data-filter]');
+      if (!tab) return;
+      document.querySelectorAll('#tab-bar .tab-bar__item').forEach(t => t.classList.remove('is-active'));
+      tab.classList.add('is-active');
+      activeFilter = tab.dataset.filter;
+      render();
+    });
+
     loadApprovals();
-  } catch(e) {
-    toast.error('Gagal', e.message);
-  }
-};
-
-window.toggleReject = (id) => {
-  const form = document.getElementById(`reject-form-${id}`);
-  form.classList.toggle('is-open');
-};
-
-window.rejectReq = async (id) => {
-  const reason = document.getElementById(`reject-reason-${id}`).value;
-  if (!reason) { toast.error('Pilih alasan', 'Silakan pilih alasan penolakan.'); return; }
-  
-  try {
-    await api.requests.updateStatus(id, 'REJECTED', reason);
-    toast.warning('Permintaan ditolak', 'Peminjam akan mendapat notifikasi.');
-    loadApprovals();
-  } catch(e) {
-    toast.error('Gagal', e.message);
-  }
-};
-
-document.getElementById('tab-bar').addEventListener('click', e => {
-  const tab = e.target.closest('[data-filter]');
-  if (!tab) return;
-  document.querySelectorAll('#tab-bar .tab-bar__item').forEach(t => t.classList.remove('is-active'));
-  tab.classList.add('is-active');
-  activeFilter = tab.dataset.filter;
-  render();
-});
-
-loadApprovals();
-lucide.createIcons();
-</script>
+    lucide.createIcons();
+  </script>
 </body>
+
 </html>

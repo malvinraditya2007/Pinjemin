@@ -23,6 +23,11 @@ jobs:
           cd pinjemin-backend
           npm install --legacy-peer-deps
 
+      - name: Generate Prisma Client
+        run: |
+          cd pinjemin-backend
+          npx prisma generate
+
       - name: Build Docker Image
         run: |
           cd pinjemin-backend

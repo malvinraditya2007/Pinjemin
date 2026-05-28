@@ -39,7 +39,9 @@
 
 <script type="module">
 import { renderAppShell } from '../js/layout.js';
-import api, { CURRENT_USER_ID } from '../js/api.js';
+import { requireLogin, getUser } from '../js/auth.js';
+requireLogin();
+import api from '../js/api.js';
 import { getTrustLevel, getCategoryInfo, formatDate, formatIDR, getInitials } from '../js/utils.js';
 import toast from '../js/toast.js';
 
@@ -48,10 +50,14 @@ renderAppShell('profile');
 let user = null;
 let myItems = [];
 
+// Ambil ID user yang sedang login dari localStorage
+const loggedInUser = getUser();
+const MY_ID = loggedInUser?.id || 'user-001';
+
 async function init() {
   const params = new URLSearchParams(location.search);
-  const userId = params.get('user') || CURRENT_USER_ID;
-  const isMe = userId === CURRENT_USER_ID;
+  const userId = params.get('user') || MY_ID;
+  const isMe = userId === MY_ID;
 
   try {
     // Fire both API calls in parallel for ~1s total load time
@@ -250,11 +256,11 @@ window.openEditProfile = () => {
             </div>
             <div class="form-group">
               <label class="form-label">Username</label>
-              <div style="position:relative">
-                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--color-neutral-400);font-weight:600;pointer-events:none">@</span>
-                <input type="text" class="form-input" id="edit-username" style="padding-left:28px" placeholder="budi_santoso" autocomplete="off" />
+              <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--color-neutral-100);border:1.5px solid var(--color-neutral-200);border-radius:var(--radius-md);color:var(--color-neutral-500)">
+                <i data-lucide="lock" style="width:15px;height:15px;flex-shrink:0;color:var(--color-neutral-400)"></i>
+                <span id="edit-username-display" style="font-weight:600"></span>
               </div>
-              <div class="form-hint" style="margin-top:4px;font-size:var(--text-body-xs-size);color:var(--color-neutral-400)">Huruf kecil, angka, dan underscore. 3–30 karakter.</div>
+              <div class="form-hint" style="margin-top:4px;font-size:var(--text-body-xs-size);color:var(--color-neutral-400)">Username tidak dapat diubah setelah akun dibuat.</div>
             </div>
             <div class="form-group">
               <label class="form-label">Bio Singkat</label>
@@ -273,19 +279,14 @@ window.openEditProfile = () => {
       </div>
     `;
     document.body.appendChild(div);
-    // Auto-lowercase + strip invalid chars as the user types (attached once)
-    document.getElementById('edit-username').addEventListener('input', function() {
-      const pos = this.selectionStart;
-      this.value = this.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
-      this.setSelectionRange(pos, pos);
-    });
+    // No username listener needed — username is read-only
 
     lucide.createIcons();
   }
   
   // Set values now that the elements definitely exist
   document.getElementById('edit-fullname').value = user.fullName;
-  document.getElementById('edit-username').value = user.username || '';
+  document.getElementById('edit-username-display').textContent = '@' + (user.username || '');
   document.getElementById('edit-bio').value = user.bio || '';
   document.getElementById('edit-address').value = user.address || '';
   
@@ -301,16 +302,10 @@ window.closeEditProfile = () => {
 
 window.saveProfile = async () => {
   const fullName = document.getElementById('edit-fullname').value.trim();
-  const username = document.getElementById('edit-username').value.trim();
   const bio = document.getElementById('edit-bio').value.trim();
   const address = document.getElementById('edit-address').value.trim();
   
   if (!fullName) { toast.error('Error', 'Nama lengkap wajib diisi'); return; }
-  if (!username) { toast.error('Error', 'Username wajib diisi'); return; }
-  if (!/^[a-z0-9_]{3,30}$/.test(username)) {
-    toast.error('Username Tidak Valid', 'Gunakan huruf kecil, angka, atau underscore (3–30 karakter)');
-    return;
-  }
   
   const btn = document.getElementById('save-edit-btn');
   const ogText = btn.innerHTML;
@@ -318,7 +313,7 @@ window.saveProfile = async () => {
   btn.disabled = true;
   
   try {
-    await api.users.updateMe({ fullName, username, bio, address });
+    await api.users.updateMe({ fullName, bio, address });
     toast.success('Berhasil', 'Profil berhasil diperbarui!');
     closeEditProfile();
     init(); // reload data

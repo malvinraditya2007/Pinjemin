@@ -1,8 +1,22 @@
 // Configuration
 const BASE_URL = 'http://localhost:3000/v1';
 
-// For local development, we hardcode the user ID to the seed user.
-// In a real app, this would come from a JWT or session cookie.
+// Prefer the logged-in user's ID from localStorage (set after JWT login).
+// Fall back to the seed user for backward-compatible local dev.
+function getCurrentUserId() {
+  try {
+    const user = JSON.parse(localStorage.getItem('pinjemin_user') || 'null');
+    return user?.id || 'user-001';
+  } catch {
+    return 'user-001';
+  }
+}
+
+function getJwtToken() {
+  return localStorage.getItem('pinjemin_token') || null;
+}
+
+// Export a stable constant for parts of the app that imported it before
 const CURRENT_USER_ID = 'user-001';
 
 /**
@@ -25,9 +39,11 @@ async function fetchAPI(endpoint, options = {}) {
     return _inflight.get(url);
   }
 
+  const token = getJwtToken();
   const headers = {
     'Content-Type': 'application/json',
-    'x-user-id': CURRENT_USER_ID,
+    'x-user-id': getCurrentUserId(), // kept for mock auth backward compat
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 

@@ -6,6 +6,7 @@ const { errorHandler } = require('./middleware/errorHandler');
 const { mockAuth } = require('./middleware/auth');
 
 // Routes
+const authRoutes = require('./routes/auth.routes');
 const usersRoutes = require('./routes/users.routes');
 const itemsRoutes = require('./routes/items.routes');
 const requestsRoutes = require('./routes/requests.routes');
@@ -27,7 +28,10 @@ const limiter = rateLimit({
 });
 app.use('/v1', limiter);
 
-// Mock Auth Middleware
+// ── Auth routes (public — no mockAuth required) ──────────────
+app.use('/v1/auth', authRoutes);
+
+// Mock Auth Middleware (applied only to non-auth routes below)
 app.use('/v1', mockAuth);
 
 // Routes mounting

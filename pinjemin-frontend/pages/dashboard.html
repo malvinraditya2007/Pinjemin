@@ -138,7 +138,9 @@
     import { renderAppShell } from '../js/layout.js';
     import api from '../js/api.js';
     import { formatRelativeTime, getCategoryInfo, getConditionLabel, formatIDR, getInitials } from '../js/utils.js';
+    import { requireLogin } from '../js/auth.js';
 
+    requireLogin();
     renderAppShell('dashboard');
 
     let user;

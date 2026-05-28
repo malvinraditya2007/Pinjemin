@@ -4,6 +4,61 @@
  */
 
 import { animateCountUp } from '../utils.js';
+import { isLoggedIn, getUser, logout } from '../auth.js';
+
+// ── Auth-aware navbar & CTA ───────────────────────────────
+(function updateNavForAuth() {
+  const user      = getUser();
+  const loggedIn  = isLoggedIn();
+  const ctaBtn    = document.getElementById('nav-cta-btn');
+  const heroCta   = document.getElementById('hero-cta-btn');
+  const mainCta   = document.getElementById('cta-main-btn');
+
+  if (loggedIn && user) {
+    // Show user name + logout in navbar
+    if (ctaBtn) {
+      ctaBtn.href = 'pages/dashboard.html';
+      ctaBtn.textContent = 'Dashboard';
+    }
+
+    // Add login/register replacement
+    const actions = document.getElementById('navbar-actions');
+    if (actions) {
+      const greet = document.createElement('span');
+      greet.style.cssText = 'font-weight:600;color:var(--color-primary-600);font-size:0.875rem;';
+      greet.textContent = `Halo, ${user.nama.split(' ')[0]}`;
+      actions.insertBefore(greet, actions.firstChild);
+
+      const logoutBtn = document.createElement('button');
+      logoutBtn.className = 'btn btn-outline-neutral btn-md btn-pill';
+      logoutBtn.textContent = 'Logout';
+      logoutBtn.addEventListener('click', () => logout('../pages/login.html'));
+      actions.appendChild(logoutBtn);
+    }
+
+    // Point all CTAs to dashboard
+    if (heroCta)  { heroCta.href = 'pages/dashboard.html'; heroCta.childNodes[0].textContent = 'Buka Dashboard'; }
+    if (mainCta)  { mainCta.href = 'pages/dashboard.html'; mainCta.childNodes[0].textContent = 'Buka Dashboard'; }
+  } else {
+    // Show login/daftar buttons
+    const actions = document.getElementById('navbar-actions');
+    if (actions) {
+      const loginBtn = document.createElement('a');
+      loginBtn.href = 'pages/login.html';
+      loginBtn.className = 'btn btn-outline btn-md btn-pill';
+      loginBtn.textContent = 'Login';
+      actions.insertBefore(loginBtn, actions.firstChild);
+
+      const daftarBtn = document.createElement('a');
+      daftarBtn.href = 'pages/register.html';
+      daftarBtn.className = 'btn btn-accent btn-md btn-pill';
+      daftarBtn.textContent = 'Daftar Gratis';
+      actions.appendChild(daftarBtn);
+
+      if (ctaBtn) ctaBtn.remove();
+    }
+  }
+})();
 
 // ── Intersection Observer for scroll reveals ──────────────
 const revealObserver = new IntersectionObserver(

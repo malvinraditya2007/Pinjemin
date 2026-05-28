@@ -5,6 +5,7 @@
 import api, { CURRENT_USER_ID } from './api.js';
 import { getTrustLevel, getInitials } from './utils.js';
 import toast from './toast.js';
+import { logout } from './auth.js';
 
 export function renderAppShell(activePage = '') {
   // Render placeholder first
@@ -58,6 +59,10 @@ export function renderAppShell(activePage = '') {
         <i data-lucide="arrow-left" style="width:18px;height:18px"></i>
         <span class="sidebar__link-text">Kembali ke Landing</span>
       </a>
+      <button class="sidebar__link" id="sidebar-logout-btn" style="border:none;background:none;cursor:pointer;width:100%;text-align:left;color:var(--color-danger)">
+        <i data-lucide="log-out" style="width:18px;height:18px"></i>
+        <span class="sidebar__link-text">Logout</span>
+      </button>
     </div>
   </aside>
   <div class="sidebar-overlay" id="sidebar-overlay"></div>`;
@@ -146,6 +151,11 @@ export function renderAppShell(activePage = '') {
   document.getElementById('sidebar-overlay')?.addEventListener('click', () => {
     document.getElementById('sidebar').classList.remove('is-open');
     document.getElementById('sidebar-overlay').classList.remove('is-active');
+  });
+
+  // Sidebar logout button
+  document.getElementById('sidebar-logout-btn')?.addEventListener('click', () => {
+    logout('login.html');
   });
 
   if (typeof lucide !== 'undefined') lucide.createIcons();
