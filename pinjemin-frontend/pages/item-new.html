@@ -158,13 +158,10 @@
         <div class="card__header"><div class="text-heading-lg">📍 Langkah 4/4: Lokasi & Preview</div></div>
         <div class="card__body">
           <div class="form-group">
-            <label class="form-label" for="neighborhood">Nama Kelurahan / Area</label>
-            <input type="text" class="form-input" id="neighborhood" placeholder="cth: Menteng, Jakarta Pusat"/>
+            <label class="form-label" for="neighborhood">Alamat Lengkap</label>
+            <input type="text" class="form-input" id="neighborhood" placeholder="cth: Jl. Sudirman No. 10, Menteng, Jakarta Pusat"/>
           </div>
-          <button class="btn btn-outline btn-md" style="margin-top:var(--space-3)" onclick="detectLocation()">
-            <i data-lucide="navigation" style="width:16px;height:16px"></i>
-            Deteksi Lokasi Otomatis
-          </button>
+
 
           <!-- Preview Card -->
           <div style="margin-top:var(--space-8);padding-top:var(--space-8);border-top:1px solid var(--color-neutral-200)">
@@ -206,14 +203,7 @@ window.goStep = function(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-window.detectLocation = function() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(() => {
-      document.getElementById('neighborhood').value = 'Menteng, Jakarta Pusat';
-      toast.success('Lokasi terdeteksi!', 'Menteng, Jakarta Pusat');
-    }, () => toast.error('Gagal deteksi lokasi', 'Izinkan akses lokasi di browser.'));
-  } else { toast.error('Tidak didukung', 'Browser tidak mendukung geolokasi.'); }
-};
+
 
 function renderPreview() {
   const title = document.getElementById('item-title').value || 'Nama Barang';
