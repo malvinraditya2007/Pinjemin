@@ -33,7 +33,12 @@ const mockAuth = async (req, res, next) => {
     }
 
     if (!userId) {
-      // For local development, if no header is provided, use the first user.
+      // In production, unauthenticated requests must be rejected.
+      // In development, fall back to the first DB user for convenience.
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(401).json({ error: 'Unauthorized: Authentication required' });
+      }
+
       // Cache the default user ID so we don't query DB on every unauthenticated request.
       if (!global.__defaultUserId) {
         const defaultUser = await prisma.user.findFirst();

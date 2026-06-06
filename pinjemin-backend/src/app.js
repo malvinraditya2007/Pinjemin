@@ -16,7 +16,19 @@ const notificationsRoutes = require('./routes/notifications.routes');
 const app = express();
 
 // Middleware
-app.use(cors());
+// Restrict CORS to frontend origin — set FRONTEND_URL in .env for production
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5500')
+  .split(',').map(o => o.trim());
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl, Postman in dev)
+    if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error(`CORS: origin '${origin}' not allowed`));
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 app.use(morgan('dev'));

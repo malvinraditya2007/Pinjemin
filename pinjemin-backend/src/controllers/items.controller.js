@@ -82,9 +82,23 @@ exports.updateItem = async (req, res, next) => {
     if (!item) return res.status(404).json({ error: 'Item not found' });
     if (item.ownerId !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
 
+    // Whitelist allowed fields to prevent mass assignment attacks
+    const { title, description, category, condition, depositAmount, neighborhood, tags, usageGuidelines, images, isAvailable } = req.body;
+    const allowedData = {};
+    if (title             !== undefined) allowedData.title             = title;
+    if (description       !== undefined) allowedData.description       = description;
+    if (category          !== undefined) allowedData.category          = category;
+    if (condition         !== undefined) allowedData.condition         = condition;
+    if (depositAmount     !== undefined) allowedData.depositAmount     = parseInt(depositAmount) || 0;
+    if (neighborhood      !== undefined) allowedData.neighborhood      = neighborhood;
+    if (tags              !== undefined) allowedData.tags              = tags;
+    if (usageGuidelines   !== undefined) allowedData.usageGuidelines   = usageGuidelines;
+    if (images            !== undefined) allowedData.images            = images;
+    if (isAvailable       !== undefined) allowedData.isAvailable       = Boolean(isAvailable);
+
     const updated = await prisma.item.update({
       where: { id: req.params.id },
-      data: req.body
+      data: allowedData,
     });
 
     res.json(updated);
