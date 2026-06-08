@@ -39,7 +39,7 @@
 
 <script type="module">
 import { renderAppShell } from '../js/layout.js';
-import { requireLogin, getUser } from '../js/auth.js';
+import { requireLogin, getUser, logout } from '../js/auth.js';
 requireLogin();
 import api from '../js/api.js';
 import { getTrustLevel, getCategoryInfo, formatDate, formatIDR, getInitials } from '../js/utils.js';
@@ -80,9 +80,14 @@ async function init() {
             <div class="profile-header__avatar">
               <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));color:white;font-weight:800;font-size:2rem">${initials}</div>
             </div>
-            ${isMe ? `<button class="btn btn-outline-neutral btn-md" style="margin-top:var(--space-4)" onclick="openEditProfile()">
-              <i data-lucide="edit-3" style="width:16px;height:16px"></i> Edit Profil
-            </button>` : ''}
+            ${isMe ? `<div style="display:flex;gap:var(--space-2);margin-top:var(--space-4);flex-wrap:wrap">
+              <button class="btn btn-outline-neutral btn-md" onclick="openEditProfile()">
+                <i data-lucide="edit-3" style="width:16px;height:16px"></i> Edit Profil
+              </button>
+              <button class="btn btn-md" id="profile-logout-btn" style="background:var(--color-danger-50,#FEF2F2);color:var(--color-danger,#EF4444);border:1.5px solid var(--color-danger-200,#FECACA);border-radius:var(--radius-lg)" onclick="handleLogout()">
+                <i data-lucide="log-out" style="width:16px;height:16px"></i> Logout
+              </button>
+            </div>` : ''}
           </div>
           <div class="profile-header__identity">
             <div class="profile-header__name">${user.fullName}</div>
@@ -326,6 +331,10 @@ window.saveProfile = async () => {
 };
 
 init();
+
+window.handleLogout = () => {
+  logout('../index.html');
+};
 
 
 
