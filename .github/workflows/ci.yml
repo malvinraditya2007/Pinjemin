@@ -25,8 +25,11 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Fix Binary Permissions
+        run: chmod +x ./node_modules/.bin/*
+
       - name: Generate Prisma Client
-        run: npm run db:generate
+        run: ./node_modules/.bin/prisma generate
 
       - name: Build Docker Image
         run: docker build -t pinjemin-backend .
