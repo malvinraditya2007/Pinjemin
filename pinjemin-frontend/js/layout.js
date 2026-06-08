@@ -55,10 +55,6 @@ export function renderAppShell(activePage = '') {
       `).join('')}
     </nav>
     <div class="sidebar__bottom">
-      <a href="../index.html" class="sidebar__link">
-        <i data-lucide="arrow-left" style="width:18px;height:18px"></i>
-        <span class="sidebar__link-text">Kembali ke Landing</span>
-      </a>
       <button class="sidebar__link" id="sidebar-logout-btn" style="border:none;background:none;cursor:pointer;width:100%;text-align:left;color:var(--color-danger)">
         <i data-lucide="log-out" style="width:18px;height:18px"></i>
         <span class="sidebar__link-text">Logout</span>
@@ -155,7 +151,7 @@ export function renderAppShell(activePage = '') {
 
   // Sidebar logout button
   document.getElementById('sidebar-logout-btn')?.addEventListener('click', () => {
-    logout('login.html');
+    logout('../index.html');
   });
 
   if (typeof lucide !== 'undefined') lucide.createIcons();

@@ -6,6 +6,11 @@
 import { animateCountUp } from '../utils.js';
 import { isLoggedIn, getUser, logout } from '../auth.js';
 
+// ── Redirect logged-in users away from landing page ───────
+if (isLoggedIn()) {
+  window.location.replace('pages/dashboard.html');
+}
+
 // ── Auth-aware navbar & CTA ───────────────────────────────
 (function updateNavForAuth() {
   const user      = getUser();
