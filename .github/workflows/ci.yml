@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: pinjemin-backend
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -19,16 +23,10 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: |
-          cd pinjemin-backend
-          npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
       - name: Generate Prisma Client
-        run: |
-          cd pinjemin-backend
-          npx prisma generate
+        run: npm run db:generate
 
       - name: Build Docker Image
-        run: |
-          cd pinjemin-backend
-          docker build -t pinjemin-backend .
+        run: docker build -t pinjemin-backend .
