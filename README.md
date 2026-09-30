@@ -76,7 +76,7 @@ npx prisma generate
 npm run db:seed
 ```
 
-## 🏃‍♂️ Cara Menjalankan (Running the App)
+## Cara Menjalankan (Running the App)
 
 ### 1. Menyalakan Backend Server
 Dari dalam folder `pinjemin-backend`, jalankan perintah *development server*:
