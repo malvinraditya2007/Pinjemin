@@ -52,7 +52,7 @@ exports.getItem = async (req, res, next) => {
 
 exports.createItem = async (req, res, next) => {
   try {
-    const { title, description, category, condition, depositAmount, neighborhood, tags, usageGuidelines, images } = req.body;
+    const { title, description, category, condition, depositAmount, neighborhood, lat, lng, tags, usageGuidelines, images } = req.body;
     
     // Parse images: frontend sends JSON.stringify([...base64]), schema expects Json (JSONB)
     let parsedImages = [];
@@ -74,6 +74,8 @@ exports.createItem = async (req, res, next) => {
         condition,
         depositAmount: parseInt(depositAmount) || 0,
         neighborhood: neighborhood || req.user.address || 'Unknown',
+        lat: lat ? parseFloat(lat) : null,
+        lng: lng ? parseFloat(lng) : null,
         tags: parsedTags,
         usageGuidelines,
         images: parsedImages,
@@ -95,7 +97,7 @@ exports.updateItem = async (req, res, next) => {
     if (item.ownerId !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
 
     // Whitelist allowed fields to prevent mass assignment attacks
-    const { title, description, category, condition, depositAmount, neighborhood, tags, usageGuidelines, images, isAvailable } = req.body;
+    const { title, description, category, condition, depositAmount, neighborhood, lat, lng, tags, usageGuidelines, images, isAvailable } = req.body;
     const allowedData = {};
     if (title             !== undefined) allowedData.title             = title;
     if (description       !== undefined) allowedData.description       = description;
@@ -103,6 +105,8 @@ exports.updateItem = async (req, res, next) => {
     if (condition         !== undefined) allowedData.condition         = condition;
     if (depositAmount     !== undefined) allowedData.depositAmount     = parseInt(depositAmount) || 0;
     if (neighborhood      !== undefined) allowedData.neighborhood      = neighborhood;
+    if (lat               !== undefined) allowedData.lat               = parseFloat(lat);
+    if (lng               !== undefined) allowedData.lng               = parseFloat(lng);
     if (tags              !== undefined) {
       allowedData.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : tags;
     }

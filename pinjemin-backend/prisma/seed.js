@@ -32,6 +32,8 @@ async function main() {
       totalBorrows: 18,
       successfulReturns: 17,
       address: 'Menteng, Jakarta Pusat',
+      lat: -6.1965,
+      lng: 106.8325,
       role: 'USER',
     }
   });
@@ -49,6 +51,8 @@ async function main() {
       totalBorrows: 5,
       successfulReturns: 28,
       address: 'Gondangdia, Jakarta Pusat',
+      lat: -6.1888,
+      lng: 106.8322,
       role: 'USER',
     }
   });
@@ -66,6 +70,8 @@ async function main() {
       totalBorrows: 9,
       successfulReturns: 9,
       address: 'Cikini, Jakarta Pusat',
+      lat: -6.1900,
+      lng: 106.8400,
       role: 'USER',
     }
   });
@@ -80,6 +86,8 @@ async function main() {
       trustScore: 55,
       trustLevel: 'MEMBER',
       address: 'Pegangsaan, Jakarta Pusat',
+      lat: -6.1983,
+      lng: 106.8450,
       role: 'USER',
     }
   });
@@ -97,6 +105,8 @@ async function main() {
       isAvailable: true,
       viewCount: 124,
       neighborhood: 'Menteng',
+      lat: -6.1965,
+      lng: 106.8325,
       tags: ['bor', 'listrik', 'bosch'],
       usageGuidelines: 'Harap kembalikan dalam kondisi bersih. Jangan gunakan untuk material yang terlalu keras.',
       ownerId: user2.id,
@@ -115,6 +125,8 @@ async function main() {
       isAvailable: true,
       viewCount: 89,
       neighborhood: 'Gondangdia',
+      lat: -6.1888,
+      lng: 106.8322,
       tags: ['camping', 'tenda', 'outdoor'],
       usageGuidelines: 'Keringkan sebelum dikembalikan. Cek tiang dan pasak lengkap.',
       ownerId: user3.id,
@@ -133,6 +145,8 @@ async function main() {
       isAvailable: false,
       viewCount: 210,
       neighborhood: 'Menteng',
+      lat: -6.1965,
+      lng: 106.8325,
       tags: ['proyektor', 'presentasi', 'epson'],
       usageGuidelines: 'Handle with care. Jangan sentuh lensa. Kembalikan dengan kabel lengkap.',
       ownerId: user1.id,

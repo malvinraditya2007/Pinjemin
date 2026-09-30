@@ -69,14 +69,26 @@
             <a href="discover.html" class="btn btn-outline btn-sm">Lihat Semua →</a>
           </div>
 
-          <!-- Filter Chips -->
-          <div class="filter-chips reveal" style="margin-bottom:var(--space-6)" id="cat-filters">
-            <button class="chip chip--active" data-cat="">Semua</button>
-            <button class="chip chip--default" data-cat="TOOLS">🔧 Peralatan</button>
-            <button class="chip chip--default" data-cat="ELECTRONICS">💻 Elektronik</button>
-            <button class="chip chip--default" data-cat="SPORTS">🏋️ Olahraga</button>
-            <button class="chip chip--default" data-cat="OUTDOOR">⛺ Outdoor</button>
-            <button class="chip chip--default" data-cat="KITCHEN">🍳 Dapur</button>
+          <!-- Filter Area -->
+          <div class="reveal"
+            style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--space-4); margin-bottom:var(--space-6)">
+            <!-- Filter Chips -->
+            <div class="filter-chips" id="cat-filters" style="margin-bottom:0">
+              <button class="chip chip--active" data-cat="">Semua</button>
+              <button class="chip chip--default" data-cat="TOOLS">🔧 Peralatan</button>
+              <button class="chip chip--default" data-cat="ELECTRONICS">💻 Elektronik</button>
+              <button class="chip chip--default" data-cat="SPORTS">🏋️ Olahraga</button>
+              <button class="chip chip--default" data-cat="OUTDOOR">⛺ Outdoor</button>
+              <button class="chip chip--default" data-cat="KITCHEN">🍳 Dapur</button>
+            </div>
+
+            <select id="distance-filter" class="chip chip--default"
+              style="appearance:none; padding-right:28px; background-image:url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475569%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat:no-repeat; background-position:right 8px center; outline:none; height:auto;">
+              <option value="">📍 Semua Jarak</option>
+              <option value="3">📍 &lt; 3 km</option>
+              <option value="5">📍 &lt; 5 km</option>
+              <option value="10">📍 &lt; 10 km</option>
+            </select>
           </div>
 
           <!-- Items Grid -->
@@ -107,7 +119,9 @@
               <span class="text-heading-sm">🏆 Top Peminjam Minggu Ini</span>
             </div>
             <div class="card__body card__body--sm" id="top-lenders-container">
-              <div style="text-align:center;padding:var(--space-4);color:var(--color-neutral-500);font-size:var(--text-body-sm-size)">Memuat...</div>
+              <div
+                style="text-align:center;padding:var(--space-4);color:var(--color-neutral-500);font-size:var(--text-body-sm-size)">
+                Memuat...</div>
             </div>
           </div>
 
@@ -141,6 +155,22 @@
     let itemsData = [];
     let notifsData = [];
 
+    let userLat = null;
+    let userLng = null;
+    let distanceFilterLimit = null;
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return null;
+      const R = 6371; // km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
     // Always reveal elements, regardless of API success
     function revealElements() {
       document.querySelectorAll('.reveal').forEach((el, index) => {
@@ -151,7 +181,7 @@
     async function init() {
       // Reuse promises already started by layout.js (sidebar), fall back to fresh calls
       const appData = window._appData || {};
-      
+
       // Fire all API calls in parallel for ~1s total load time
       const [userResult, itemsResult, notifsResult, topLendersResult, impactResult, sentReqsResult, rcvReqsResult] = await Promise.allSettled([
         appData.userPromise || api.users.getMe(),
@@ -166,6 +196,8 @@
       // Handle user data
       if (userResult.status === 'fulfilled') {
         user = userResult.value;
+        userLat = user.lat || -6.200000; // default Jakarta
+        userLng = user.lng || 106.816666;
         document.getElementById('greeting-text').textContent = `Halo, ${user.fullName.split(' ')[0]}! 👋`;
         document.getElementById('greeting-loc').textContent = user.address || 'Indonesia';
         document.getElementById('trust-score-val').textContent = user.trustScore;
@@ -173,6 +205,30 @@
         // Note: Assuming trust-ring-fill element exists for this logic
         if (document.getElementById('trust-ring-fill')) {
           document.getElementById('trust-ring-fill').style.strokeDashoffset = offset;
+        }
+
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(async (pos) => {
+            userLat = pos.coords.latitude;
+            userLng = pos.coords.longitude;
+            renderGrid(activeFilter);
+            try {
+              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${userLat}&lon=${userLng}`);
+              const data = await res.json();
+              if (data && data.display_name) {
+                let addressName = data.display_name.split(',').slice(0, 2).join(',');
+                if (data.address) {
+                   const neighborhood = data.address.neighbourhood || data.address.suburb || data.address.village;
+                   const city = data.address.city || data.address.town || data.address.county;
+                   if (neighborhood && city) addressName = `${neighborhood}, ${city}`;
+                   else if (city) addressName = city;
+                }
+                document.getElementById('greeting-loc').innerHTML = addressName;
+              }
+            } catch(e) {
+              console.error('Reverse geocoding failed', e);
+            }
+          }, () => {});
         }
       } else {
         console.warn('Could not load user data', userResult.reason);
@@ -236,7 +292,7 @@
         const el = document.getElementById('active-borrows-count');
         if (el) el.textContent = activeCount;
       }
-      
+
       if (rcvReqsResult.status === 'fulfilled') {
         const pendingCount = rcvReqsResult.value.filter(r => r.status === 'PENDING').length;
         const el = document.getElementById('approval-count');
@@ -252,9 +308,9 @@
       const cat = getCategoryInfo(item.category);
       const initials = getInitials(item.owner.fullName);
       let images = [];
-      images = Array.isArray(item.images) ? item.images : (() => { try { return JSON.parse(item.images || '[]'); } catch(e) { return []; } })();
+      images = Array.isArray(item.images) ? item.images : (() => { try { return JSON.parse(item.images || '[]'); } catch (e) { return []; } })();
 
-      const imageHtml = images.length > 0 
+      const imageHtml = images.length > 0
         ? `<img src="${images[0]}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;" alt="${item.title}">`
         : `<div class="item-card__placeholder">
             <span>${cat.emoji}</span>
@@ -286,7 +342,7 @@
           </div>
           <span class="item-card__owner-name">${item.owner.fullName}</span>
         </div>
-        <div class="item-card__location">📍 ${item.neighborhood}</div>
+        <div class="item-card__location">📍 ${item.neighborhood}${item.distance !== null ? ` • ${item.distance.toFixed(1)} km` : ''}</div>
         <div class="item-card__footer">
           <span class="item-card__deposit ${item.depositAmount === 0 ? 'item-card__deposit--free' : ''}">
             ${item.depositAmount === 0 ? '✓ Gratis dipinjam' : `Deposit: ${formatIDR(item.depositAmount)}`}
@@ -299,8 +355,29 @@
 
     let activeFilter = '';
     function renderGrid(filter) {
-      const filtered = itemsData.filter(i => i.isAvailable && (!user || i.owner.id !== user.id) && (!filter || i.category === filter));
-      document.getElementById('items-grid').innerHTML = filtered.map(renderItemCard).join('');
+      let filtered = itemsData.filter(i => i.isAvailable && (!user || i.owner.id !== user.id) && (!filter || i.category === filter));
+
+      // Calculate distances for each item
+      filtered.forEach(i => {
+        i.distance = calculateDistance(userLat, userLng, i.lat, i.lng);
+      });
+
+      // Filter by distance
+      if (distanceFilterLimit !== null) {
+        filtered = filtered.filter(i => i.distance !== null && i.distance <= distanceFilterLimit);
+      }
+
+      // Sort by distance (closest first)
+      filtered.sort((a, b) => {
+        if (a.distance === null) return 1;
+        if (b.distance === null) return -1;
+        return a.distance - b.distance;
+      });
+
+      document.getElementById('items-grid').innerHTML = filtered.length
+        ? filtered.map(renderItemCard).join('')
+        : `<div style="grid-column:1/-1;text-align:center;padding:var(--space-10) var(--space-4);color:var(--color-neutral-400)">Belum ada barang yang cocok di area ini.</div>`;
+
       lucide.createIcons();
     }
 
@@ -310,6 +387,12 @@
       document.querySelectorAll('#cat-filters .chip').forEach(c => { c.className = 'chip chip--default'; });
       btn.className = 'chip chip--active';
       activeFilter = btn.dataset.cat;
+      renderGrid(activeFilter);
+    });
+
+    document.getElementById('distance-filter').addEventListener('change', e => {
+      const val = e.target.value;
+      distanceFilterLimit = val ? parseFloat(val) : null;
       renderGrid(activeFilter);
     });
 

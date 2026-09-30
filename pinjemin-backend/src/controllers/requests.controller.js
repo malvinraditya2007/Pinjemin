@@ -7,7 +7,8 @@ exports.getSentRequests = async (req, res, next) => {
       where: { borrowerId: req.user.id },
       include: {
         item: true,
-        lender: { select: { id: true, fullName: true, trustScore: true, trustLevel: true, avatarUrl: true } }
+        lender: { select: { id: true, fullName: true, trustScore: true, trustLevel: true, avatarUrl: true } },
+        review: { select: { id: true } }
       },
       orderBy: { createdAt: 'desc' }
     });

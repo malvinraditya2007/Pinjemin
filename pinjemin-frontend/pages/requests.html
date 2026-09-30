@@ -58,7 +58,9 @@ let activeFilter = '';
 
 async function loadRequests() {
   try {
-    requests = await api.requests.getSent();
+    let allRequests = await api.requests.getSent();
+    // Hilangkan dari page permintaanku jika sudah diberi rating
+    requests = allRequests.filter(r => !r.review);
     render();
   } catch(e) {
     console.error('Failed to load requests', e);
@@ -78,10 +80,11 @@ function render() {
     const ownerInitials = getInitials(req.lender.fullName);
     return `
     <div class="request-card request-card--${req.status.toLowerCase()}" style="margin-bottom:var(--space-4)">
-      <div class="request-card__avatar-wrap">
+      <div class="request-card__avatar-wrap" style="flex-direction:row; justify-content:flex-start; margin-bottom:var(--space-2)">
         <div class="avatar avatar--md">
           <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));color:white;font-weight:700">${ownerInitials}</div>
         </div>
+        <div style="font-weight:600; font-size:1rem; color:var(--color-neutral-800)">${req.lender.fullName}</div>
       </div>
       <div class="request-card__content" style="flex:1">
         <div class="request-card__headline">

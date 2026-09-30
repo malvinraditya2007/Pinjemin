@@ -91,6 +91,8 @@ model User {
   avatarUrl         String?        @map("avatar_url")               /// Profile picture URL (Cloudinary)
   bio               String?                                         /// Short bio text (profile edit modal)
   address           String?                                         /// Full address — displayed in profile & greeting
+  lat               Float?                                          /// Latitude for geolocation
+  lng               Float?                                          /// Longitude for geolocation
 
   // ── Trust & Stats (displayed in profile.html, dashboard.html) ──
   trustScore        Int            @default(40)  @map("trust_score")        /// 0–100, affects trust level
@@ -132,6 +134,8 @@ model Item {
   isAvailable     Boolean       @default(true) @map("is_available") /// false when actively borrowed
   viewCount       Int           @default(0) @map("view_count")   /// Incremented on detail page view
   neighborhood    String                                          /// Address/location text for display
+  lat             Float?                                          /// Latitude
+  lng             Float?                                          /// Longitude
   tags            String[]      @default([])                      /// PostgreSQL text array for tag search
   usageGuidelines String?       @map("usage_guidelines")          /// Optional usage instructions
 

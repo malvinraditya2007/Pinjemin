@@ -15,7 +15,10 @@
   <link rel="stylesheet" href="../css/components/toasts.css"/>
   <link rel="stylesheet" href="../css/components/sidebar.css"/>
   <link rel="stylesheet" href="../css/components/bottomnav.css"/>
+  <link rel="stylesheet" href="../css/components/modals.css"/>
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 <div class="app-shell">
@@ -159,7 +162,17 @@
         <div class="card__body">
           <div class="form-group">
             <label class="form-label" for="neighborhood">Alamat Lengkap</label>
-            <input type="text" class="form-input" id="neighborhood" placeholder="cth: Jl. Sudirman No. 10, Menteng, Jakarta Pusat"/>
+            <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline-neutral btn-sm" style="flex:1;display:flex;justify-content:center;gap:6px;align-items:center" onclick="getCurrentLocation(this)">
+                <i data-lucide="crosshair" style="width:14px;height:14px"></i> Lokasimu saat ini
+              </button>
+              <button type="button" class="btn btn-outline-neutral btn-sm" style="flex:1;display:flex;justify-content:center;gap:6px;align-items:center" onclick="openMapModal()">
+                <i data-lucide="map" style="width:14px;height:14px"></i> Pilih lewat peta
+              </button>
+            </div>
+            <input type="text" class="form-input" id="neighborhood" placeholder="cth: Jl. Sudirman No. 10, Menteng, Jakarta Pusat" oninput="if(window.renderPreview) window.renderPreview()"/>
+            <input type="hidden" id="edit-lat" />
+            <input type="hidden" id="edit-lng" />
           </div>
 
 
@@ -289,8 +302,11 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   btn.innerHTML = 'Menyimpan...';
   btn.disabled = true;
 
+  const lat = document.getElementById('edit-lat').value;
+  const lng = document.getElementById('edit-lng').value;
+
   try {
-    await api.items.create({
+    const payload = {
       title,
       category,
       condition,
@@ -300,7 +316,12 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
       tags,
       usageGuidelines,
       images: JSON.stringify(uploadedImages.filter(Boolean))
-    });
+    };
+    if (lat && lng) {
+      payload.lat = parseFloat(lat);
+      payload.lng = parseFloat(lng);
+    }
+    await api.items.create(payload);
     
     toast.success('Barang berhasil didaftarkan! 🎉', `"${title}" sekarang bisa ditemukan komunitas.`);
     setTimeout(() => location.href = 'dashboard.html', 2000);
@@ -310,6 +331,180 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     btn.disabled = false;
   }
 });
+
+window.renderPreview = renderPreview;
+
+let mapInstance = null;
+let mapMarker = null;
+let currentSelectedLat = -6.200000;
+let currentSelectedLng = 106.816666; // Default Jakarta
+let currentAddressStr = '';
+
+window.openMapModal = () => {
+  if (!document.getElementById('map-modal-container')) {
+    const div = document.createElement('div');
+    div.id = 'map-modal-container';
+    div.innerHTML = `
+      <div class="modal-backdrop" id="map-modal-overlay" style="z-index: 2000;">
+        <div class="modal modal--md" id="map-modal" style="width: 90vw; max-width: 600px; overflow: hidden; padding: 0;">
+          <div class="modal__header" style="padding: 16px; border-bottom: 1px solid var(--color-neutral-200);">
+            <h2 class="modal__title">Pilih Lokasi</h2>
+            <button class="modal__close" onclick="closeMapModal()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+          </div>
+          <div class="modal__body" style="padding: 0;">
+            <div id="leaflet-map" style="height: 60vh; width: 100%; min-height: 300px; z-index: 1;"></div>
+            <div style="padding: 16px; background: white; z-index: 2; position: relative; border-top: 1px solid var(--color-neutral-200);">
+              <p id="map-address-preview" style="margin-bottom: 12px; font-weight: 500; font-size: 14px; color: var(--color-neutral-700);">Memuat lokasi...</p>
+              <button class="btn btn-primary btn-pill" style="width: 100%;" onclick="confirmMapLocation()">Konfirmasi Lokasi</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(div);
+    lucide.createIcons();
+  }
+  
+  document.getElementById('map-modal-overlay').classList.add('is-open');
+  
+  setTimeout(() => {
+    initLeafletMap();
+  }, 350);
+};
+
+window.closeMapModal = () => {
+  const overlay = document.getElementById('map-modal-overlay');
+  if (overlay) overlay.classList.remove('is-open');
+};
+
+window.initLeafletMap = () => {
+  if (!mapInstance) {
+    mapInstance = L.map('leaflet-map').setView([currentSelectedLat, currentSelectedLng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(mapInstance);
+    
+    mapMarker = L.marker([currentSelectedLat, currentSelectedLng], {draggable: true}).addTo(mapInstance);
+    
+    mapMarker.on('dragend', function(e) {
+      const position = mapMarker.getLatLng();
+      updateMapLocation(position.lat, position.lng);
+    });
+
+    mapInstance.on('click', function(e) {
+      updateMapLocation(e.latlng.lat, e.latlng.lng);
+    });
+    
+    const savedLat = parseFloat(document.getElementById('edit-lat').value);
+    const savedLng = parseFloat(document.getElementById('edit-lng').value);
+    
+    if (!isNaN(savedLat) && !isNaN(savedLng)) {
+      updateMapLocation(savedLat, savedLng, true);
+    } else {
+      mapInstance.locate({setView: true, maxZoom: 16});
+      mapInstance.on('locationfound', function(e) {
+        updateMapLocation(e.latlng.lat, e.latlng.lng);
+      });
+      mapInstance.on('locationerror', function(e) {
+        reverseGeocode(currentSelectedLat, currentSelectedLng);
+      });
+    }
+  } else {
+    mapInstance.invalidateSize();
+    const savedLat = parseFloat(document.getElementById('edit-lat').value);
+    const savedLng = parseFloat(document.getElementById('edit-lng').value);
+    if (!isNaN(savedLat) && !isNaN(savedLng)) {
+      updateMapLocation(savedLat, savedLng, true);
+    }
+  }
+};
+
+window.updateMapLocation = (lat, lng, centerMap = false) => {
+  currentSelectedLat = lat;
+  currentSelectedLng = lng;
+  mapMarker.setLatLng([lat, lng]);
+  if (centerMap) {
+    mapInstance.setView([lat, lng], 16);
+  }
+  reverseGeocode(lat, lng);
+};
+
+window.reverseGeocode = async (lat, lng) => {
+  const preview = document.getElementById('map-address-preview');
+  if(preview) preview.textContent = "Mencari alamat...";
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+      headers: {
+        'Accept-Language': 'id'
+      }
+    });
+    const data = await res.json();
+    if (data && data.display_name) {
+      currentAddressStr = data.display_name;
+      if(preview) preview.textContent = currentAddressStr;
+    } else {
+      if(preview) preview.textContent = "Alamat tidak ditemukan.";
+    }
+  } catch(e) {
+    console.error(e);
+    if(preview) preview.textContent = "Gagal memuat alamat.";
+  }
+};
+
+window.confirmMapLocation = () => {
+  document.getElementById('edit-lat').value = currentSelectedLat;
+  document.getElementById('edit-lng').value = currentSelectedLng;
+  document.getElementById('neighborhood').value = currentAddressStr;
+  renderPreview();
+  closeMapModal();
+};
+
+window.getCurrentLocation = (btn) => {
+  const ogText = btn.innerHTML;
+  btn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px"></i> Mencari...';
+  lucide.createIcons();
+  btn.disabled = true;
+  
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      document.getElementById('edit-lat').value = lat;
+      document.getElementById('edit-lng').value = lng;
+      
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+          headers: {
+            'Accept-Language': 'id'
+          }
+        });
+        const data = await res.json();
+        if (data && data.display_name) {
+          document.getElementById('neighborhood').value = data.display_name;
+          renderPreview();
+          toast.success('Berhasil', 'Lokasi ditemukan!');
+        }
+      } catch(e) {
+        toast.error('Gagal', 'Tidak dapat mengambil nama jalan');
+      } finally {
+        btn.innerHTML = ogText;
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }, (error) => {
+      toast.error('Gagal', 'Akses lokasi ditolak atau gagal.');
+      btn.innerHTML = ogText;
+      btn.disabled = false;
+      lucide.createIcons();
+    }, { timeout: 10000 });
+  } else {
+    toast.error('Gagal', 'Geolocation tidak didukung browser ini.');
+    btn.innerHTML = ogText;
+    btn.disabled = false;
+    lucide.createIcons();
+  }
+};
 
 lucide.createIcons();
 </script>
