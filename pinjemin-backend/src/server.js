@@ -1,4 +1,13 @@
 require('dotenv').config();
+
+// ── Fail-Fast Env Validation ─────────────────────────────────────────
+const requiredEnvs = ['DATABASE_URL', 'JWT_SECRET'];
+const missingEnvs = requiredEnvs.filter((env) => !process.env[env]);
+if (missingEnvs.length > 0) {
+  console.error(`❌ FATAL ERROR: Missing required environment variables: ${missingEnvs.join(', ')}`);
+  process.exit(1);
+}
+
 const http = require('http');
 const app = require('./app');
 const { initSocket } = require('./config/socket');

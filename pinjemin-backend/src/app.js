@@ -5,6 +5,11 @@ const rateLimit = require('express-rate-limit');
 const { errorHandler } = require('./middleware/errorHandler');
 const { mockAuth } = require('./middleware/auth');
 
+// Patch BigInt for JSON.stringify to prevent errors when returning BigInt from Prisma
+BigInt.prototype.toJSON = function () {
+  return Number(this);
+};
+
 // Routes
 const authRoutes = require('./routes/auth.routes');
 const usersRoutes = require('./routes/users.routes');

@@ -1,26 +1,9 @@
-const prisma = require('../config/prisma');
+const itemsService = require('../services/items.service');
 
 exports.getItems = async (req, res, next) => {
   try {
     const { category, condition, search } = req.query;
-    
-    let where = {};
-    if (category) where.category = category;
-    if (condition) where.condition = condition;
-    if (search) {
-      where.title = { contains: search, mode: 'insensitive' };
-    }
-
-    const items = await prisma.item.findMany({
-      where,
-      include: {
-        owner: {
-          select: { id: true, fullName: true, username: true, trustScore: true, trustLevel: true, avatarUrl: true, createdAt: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-
+    const items = await itemsService.getAllItems({ category, condition, search });
     res.json(items);
   } catch (err) {
     next(err);
@@ -29,60 +12,24 @@ exports.getItems = async (req, res, next) => {
 
 exports.getItem = async (req, res, next) => {
   try {
-    const item = await prisma.item.findUnique({
-      where: { id: req.params.id },
-      include: {
-        owner: {
-          select: { id: true, fullName: true, username: true, trustScore: true, trustLevel: true, avatarUrl: true, createdAt: true }
-        }
-      }
-    });
-    if (!item) {
-      return res.status(404).json({ error: 'Item not found' });
-    }
-    
-    // Increment view count — fire-and-forget (no await) to avoid blocking the response
-    prisma.item.update({ where: { id: item.id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
-
+    const item = await itemsService.getItemById(req.params.id);
     res.json(item);
   } catch (err) {
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
+    }
     next(err);
   }
 };
 
 exports.createItem = async (req, res, next) => {
   try {
-    const { title, description, category, condition, depositAmount, neighborhood, lat, lng, tags, usageGuidelines, images } = req.body;
-    
-    // Parse images: frontend sends JSON.stringify([...base64]), schema expects Json (JSONB)
-    let parsedImages = [];
-    if (images) {
-      try { parsedImages = typeof images === 'string' ? JSON.parse(images) : images; }
-      catch { parsedImages = []; }
+    // Inject user address if neighborhood isn't provided
+    const itemData = { ...req.body };
+    if (!itemData.neighborhood && req.user && req.user.address) {
+      itemData.neighborhood = req.user.address;
     }
-
-    // Parse tags: frontend sends "bor, listrik, bosch", schema expects String[]
-    const parsedTags = tags
-      ? (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : tags)
-      : [];
-
-    const newItem = await prisma.item.create({
-      data: {
-        title,
-        description,
-        category,
-        condition,
-        depositAmount: parseInt(depositAmount) || 0,
-        neighborhood: neighborhood || req.user.address || 'Unknown',
-        lat: lat ? parseFloat(lat) : null,
-        lng: lng ? parseFloat(lng) : null,
-        tags: parsedTags,
-        usageGuidelines,
-        images: parsedImages,
-        ownerId: req.user.id
-      }
-    });
-    
+    const newItem = await itemsService.createItem(req.user.id, itemData);
     res.status(201).json(newItem);
   } catch (err) {
     next(err);
@@ -91,55 +38,24 @@ exports.createItem = async (req, res, next) => {
 
 exports.updateItem = async (req, res, next) => {
   try {
-    // Only owner can update (basic check)
-    const item = await prisma.item.findUnique({ where: { id: req.params.id } });
-    if (!item) return res.status(404).json({ error: 'Item not found' });
-    if (item.ownerId !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
-
-    // Whitelist allowed fields to prevent mass assignment attacks
-    const { title, description, category, condition, depositAmount, neighborhood, lat, lng, tags, usageGuidelines, images, isAvailable } = req.body;
-    const allowedData = {};
-    if (title             !== undefined) allowedData.title             = title;
-    if (description       !== undefined) allowedData.description       = description;
-    if (category          !== undefined) allowedData.category          = category;
-    if (condition         !== undefined) allowedData.condition         = condition;
-    if (depositAmount     !== undefined) allowedData.depositAmount     = parseInt(depositAmount) || 0;
-    if (neighborhood      !== undefined) allowedData.neighborhood      = neighborhood;
-    if (lat               !== undefined) allowedData.lat               = parseFloat(lat);
-    if (lng               !== undefined) allowedData.lng               = parseFloat(lng);
-    if (tags              !== undefined) {
-      allowedData.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : tags;
-    }
-    if (usageGuidelines   !== undefined) allowedData.usageGuidelines   = usageGuidelines;
-    if (images            !== undefined) {
-      if (typeof images === 'string') {
-        try { allowedData.images = JSON.parse(images); } catch { allowedData.images = []; }
-      } else {
-        allowedData.images = images;
-      }
-    }
-    if (isAvailable       !== undefined) allowedData.isAvailable       = Boolean(isAvailable);
-
-    const updated = await prisma.item.update({
-      where: { id: req.params.id },
-      data: allowedData,
-    });
-
+    const updated = await itemsService.updateItem(req.user.id, req.params.id, req.body);
     res.json(updated);
   } catch (err) {
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
+    }
     next(err);
   }
 };
 
 exports.deleteItem = async (req, res, next) => {
   try {
-    const item = await prisma.item.findUnique({ where: { id: req.params.id } });
-    if (!item) return res.status(404).json({ error: 'Item not found' });
-    if (item.ownerId !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
-
-    await prisma.item.delete({ where: { id: req.params.id } });
+    await itemsService.deleteItem(req.user.id, req.params.id);
     res.status(204).send();
   } catch (err) {
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
+    }
     next(err);
   }
 };

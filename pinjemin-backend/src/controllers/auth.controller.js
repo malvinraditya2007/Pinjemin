@@ -1,8 +1,4 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const prisma = require('../config/prisma');
-
-const SALT_ROUNDS = 10;
+const authService = require('../services/auth.service');
 
 /**
  * POST /v1/auth/register
@@ -27,29 +23,16 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Password minimal 6 karakter.' });
     }
 
-    // ── Check for existing username ─────────────────────────
-    const existing = await prisma.user.findUnique({ where: { username: username.toLowerCase() } });
-    if (existing) {
-      return res.status(409).json({ success: false, message: 'Username sudah digunakan.' });
-    }
-
-    // ── Hash password & create user ──────────────────────────
-    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-
-    const user = await prisma.user.create({
-      data: {
-        username: username.toLowerCase(),
-        fullName: nama,
-        passwordHash,
-        role: 'USER',
-      },
-    });
+    await authService.registerUser({ nama, username, password });
 
     return res.status(201).json({
       success: true,
       message: 'Registrasi berhasil. Silakan login.',
     });
   } catch (err) {
+    if (err.status) {
+      return res.status(err.status).json({ success: false, message: err.message });
+    }
     next(err);
   }
 };
@@ -66,29 +49,7 @@ exports.login = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Username dan password wajib diisi.' });
     }
 
-    // ── Find user by username ───────────────────────────────
-    const user = await prisma.user.findUnique({ where: { username: username.toLowerCase() } });
-    if (!user || !user.passwordHash) {
-      return res.status(401).json({ success: false, message: 'Username atau password salah.' });
-    }
-
-    // ── Compare password ────────────────────────────────────
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
-    if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Username atau password salah.' });
-    }
-
-    // ── Issue JWT ───────────────────────────────────────────
-    const payload = {
-      id: user.id,
-      username: user.username,
-      nama: user.fullName,
-      role: user.role,
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-    });
+    const { token, user } = await authService.loginUser({ username, password });
 
     return res.status(200).json({
       success: true,
@@ -104,6 +65,9 @@ exports.login = async (req, res, next) => {
       },
     });
   } catch (err) {
+    if (err.status) {
+      return res.status(err.status).json({ success: false, message: err.message });
+    }
     next(err);
   }
 };
@@ -115,33 +79,13 @@ exports.login = async (req, res, next) => {
 exports.getMe = async (req, res, next) => {
   try {
     // req.user is populated by jwtAuth middleware
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        email: true,
-        phone: true,
-        avatarUrl: true,
-        bio: true,
-        trustScore: true,
-        trustLevel: true,
-        totalLends: true,
-        totalBorrows: true,
-        successfulReturns: true,
-        address: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User tidak ditemukan.' });
-    }
+    const user = await authService.getUserProfile(req.user.id);
 
     return res.json({ success: true, user });
   } catch (err) {
+    if (err.status) {
+      return res.status(err.status).json({ success: false, message: err.message });
+    }
     next(err);
   }
 };

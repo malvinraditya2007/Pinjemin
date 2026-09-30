@@ -1,101 +1,32 @@
-const prisma = require('../config/prisma');
+const usersService = require('../services/users.service');
 
 exports.getMe = async (req, res, next) => {
   try {
-    // Always query fresh from DB so stat fields (totalLends, totalBorrows,
-    // successfulReturns) reflect the latest increments from completed transactions.
-    // Do NOT use req.user here — it comes from auth middleware cache (30s TTL)
-    // and would return stale counters after a RETURNED/APPROVED status update.
-    const freshUser = await prisma.user.findUnique({
-      where: { id: req.user.id },
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        email: true,
-        phone: true,
-        avatarUrl: true,
-        bio: true,
-        address: true,
-        trustScore: true,
-        trustLevel: true,
-        totalLends: true,
-        totalBorrows: true,
-        successfulReturns: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-        // passwordHash and deletedAt intentionally excluded
-      },
-    });
-
-    if (!freshUser) return res.status(404).json({ error: 'User not found' });
-
+    const freshUser = await usersService.getMe(req.user.id);
     res.json(freshUser);
   } catch (err) {
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
+    }
     next(err);
   }
 };
 
 exports.updateMe = async (req, res, next) => {
   try {
-    const { fullName, bio, address, username } = req.body;
-
-    // Validate username format if provided
-    if (username !== undefined) {
-      if (!/^[a-z0-9_]{3,30}$/.test(username)) {
-        return res.status(400).json({
-          error: 'Username hanya boleh berisi huruf kecil, angka, dan underscore (3–30 karakter)'
-        });
-      }
-    }
-
-    const updatedUser = await prisma.user.update({
-      where: { id: req.user.id },
-      data: {
-        ...(fullName !== undefined && { fullName }),
-        ...(bio !== undefined && { bio }),
-        ...(address !== undefined && { address }),
-        ...(username !== undefined && { username: username.toLowerCase() }),
-      },
-    });
-
-    // Bust the auth middleware cache so next request sees updated user data
-    if (global.__authUserCache) {
-      global.__authUserCache.delete(req.user.id);
-    }
-
-    // If address changed, sync all user's items' neighborhood field
-    if (address !== undefined && address !== req.user.address) {
-      await prisma.item.updateMany({
-        where: { ownerId: req.user.id },
-        data: { neighborhood: address },
-      });
-    }
-
+    const updatedUser = await usersService.updateMe(req.user.id, req.user.address, req.body);
     res.json(updatedUser);
   } catch (err) {
-    // Prisma unique constraint violation (P2002)
-    if (err.code === 'P2002' && err.meta?.target?.includes('username')) {
-      return res.status(409).json({ error: 'Username sudah dipakai, coba yang lain' });
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
     }
     next(err);
   }
 };
 
-
 exports.getTopLenders = async (req, res, next) => {
   try {
-    const topLenders = await prisma.user.findMany({
-      orderBy: { totalLends: 'desc' },
-      take: 3,
-      select: {
-        id: true,
-        fullName: true,
-        totalLends: true,
-        trustScore: true
-      }
-    });
+    const topLenders = await usersService.getTopLenders();
     res.json(topLenders);
   } catch (err) {
     next(err);
@@ -104,12 +35,7 @@ exports.getTopLenders = async (req, res, next) => {
 
 exports.getImpact = async (req, res, next) => {
   try {
-    const user = req.user;
-    const impact = {
-      co2SavedKg: user.successfulReturns * 4,
-      moneySavedIdr: user.successfulReturns * 83333,
-      completedBorrows: user.successfulReturns
-    };
+    const impact = await usersService.getImpact(req.user.successfulReturns);
     res.json(impact);
   } catch (err) {
     next(err);
@@ -118,45 +44,12 @@ exports.getImpact = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.params.id },
-      select: {
-        id: true,
-        fullName: true,
-        username: true,
-        avatarUrl: true,
-        bio: true,
-        trustScore: true,
-        trustLevel: true,
-        totalLends: true,
-        totalBorrows: true,
-        successfulReturns: true,
-        address: true,
-        createdAt: true,
-        // Excluded: passwordHash, phone, email, role
-        items: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            category: true,
-            condition: true,
-            isAvailable: true,
-            images: true,
-            neighborhood: true,
-            depositAmount: true,
-            tags: true,
-            createdAt: true,
-          }
-        },
-      },
-    });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
+    const user = await usersService.getUser(req.params.id);
     res.json(user);
   } catch (err) {
+    if (err.status) {
+      return res.status(err.status).json({ error: err.message });
+    }
     next(err);
   }
 };

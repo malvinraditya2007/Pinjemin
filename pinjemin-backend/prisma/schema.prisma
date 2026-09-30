@@ -130,7 +130,7 @@ model Item {
   category        ItemCategory                                    /// Enum-constrained category from dropdown
   condition       ItemCondition                                   /// Enum-constrained condition from dropdown
   images          Json          @default("[]")                    /// JSONB array of base64/URL strings
-  depositAmount   Int           @default(0) @map("deposit_amount")/// Deposit in IDR; 0 = free to borrow
+  depositAmount   BigInt        @default(0) @map("deposit_amount")/// Deposit in IDR; 0 = free to borrow
   isAvailable     Boolean       @default(true) @map("is_available") /// false when actively borrowed
   viewCount       Int           @default(0) @map("view_count")   /// Incremented on detail page view
   neighborhood    String                                          /// Address/location text for display
@@ -156,7 +156,6 @@ model Item {
   @@index([ownerId])                                   /// Profile page: "my items"
   @@index([category, isAvailable, createdAt])           /// Discover: filter + sort
   @@index([category])                                   /// Dashboard category chips
-  @@index([isAvailable])                                /// Availability filter
   @@index([createdAt])                                  /// Default sort: newest
   @@map("items")
 }
@@ -191,12 +190,12 @@ model Request {
   // ── Timestamps ──
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt      @map("updated_at")
+  deletedAt    DateTime?     @map("deleted_at")  /// Soft-delete
 
   // ── Indexes ──
   @@index([borrowerId, status])    /// requests.html: "my sent requests" filtered by tab
   @@index([lenderId, status])      /// approvals.html: "requests for my items" filtered by tab
   @@index([itemId])                /// Item detail: related requests
-  @@index([status])                /// General status filter
   @@map("requests")
 }
 
@@ -210,12 +209,12 @@ model Review {
   comment   String?                                   /// Optional text review
 
   // ── Author (reviewer = borrower) ──
-  authorId  String   @map("author_id")
-  author    User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String?  @map("author_id")
+  author    User?    @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   // ── Target (reviewed user = lender) ──
-  targetId  String   @map("target_id")
-  target    User     @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  targetId  String?  @map("target_id")
+  target    User?    @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: SetNull)
 
   // ── Item reviewed ──
   itemId    String?  @map("item_id")
@@ -228,6 +227,7 @@ model Review {
   // ── Timestamps ──
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")  /// Soft-delete
 
   // ── Indexes ──
   @@index([authorId])              /// "Reviews I've given"
