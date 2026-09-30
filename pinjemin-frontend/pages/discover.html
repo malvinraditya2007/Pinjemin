@@ -114,8 +114,16 @@ const initCat = params.get('category') || '';
 if (initCat) document.getElementById('cat-select').value = initCat;
 
 let MOCK_ITEMS = [];
+let currentUser = null;
 
 async function loadItems() {
+  try {
+    const appData = window._appData || {};
+    currentUser = await (appData.userPromise || api.users.getMe());
+  } catch(e) {
+    console.error('Failed to load user', e);
+  }
+  
   try {
     MOCK_ITEMS = await api.items.getAll();
     render();
@@ -131,7 +139,7 @@ function getFiltered() {
   const avail= document.getElementById('avail-select').value;
   const loc  = document.getElementById('loc-input').value.toLowerCase();
   const sort = document.getElementById('sort-select').value;
-  let items = [...MOCK_ITEMS];
+  let items = MOCK_ITEMS.filter(i => i.isAvailable && (!currentUser || i.owner.id !== currentUser.id));
   if (q)     items = items.filter(i => i.title.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
   if (cat)   items = items.filter(i => i.category === cat);
   if (cond)  items = items.filter(i => i.condition === cond);
@@ -148,7 +156,7 @@ function render() {
     const cat = getCategoryInfo(item.category);
     const initials = getInitials(item.owner.fullName);
     let images = [];
-    try { images = JSON.parse(item.images || '[]'); } catch(e) { images = []; }
+    images = Array.isArray(item.images) ? item.images : (() => { try { return JSON.parse(item.images || '[]'); } catch(e) { return []; } })();
     const imgHTML = images.length
       ? `<img src="${images[0]}" style="width:100%;height:100%;object-fit:cover" alt="${item.title}"/>`
       : `<div class="item-card__placeholder"><span>${cat.emoji}</span></div>`;

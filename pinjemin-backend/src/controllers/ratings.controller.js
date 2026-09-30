@@ -7,6 +7,10 @@ exports.submitRating = async (req, res, next) => {
     
     const request = await prisma.request.findUnique({ where: { id: requestId } });
     if (!request) return res.status(404).json({ error: 'Request not found' });
+
+    // Prevent duplicate reviews — schema has @unique on requestId
+    const existingReview = await prisma.review.findUnique({ where: { requestId } });
+    if (existingReview) return res.status(409).json({ error: 'Review already submitted for this request' });
     
     // Simplification: borrower rates lender
     const targetId = request.lenderId;
@@ -18,7 +22,8 @@ exports.submitRating = async (req, res, next) => {
         comment,
         authorId: req.user.id,
         targetId,
-        itemId: request.itemId
+        itemId: request.itemId,
+        requestId
       }
     });
 
@@ -33,10 +38,16 @@ exports.submitRating = async (req, res, next) => {
     if (scoreChange !== 0) {
       const targetUser = await prisma.user.findUnique({ where: { id: targetId }});
       const newScore = Math.max(0, Math.min(100, targetUser.trustScore + scoreChange));
+
+      // Derive TrustLevel enum from score brackets (matches utils.js getTrustLevel)
+      let newTrustLevel = 'NEW';
+      if (newScore > 89) newTrustLevel = 'VERIFIED';
+      else if (newScore > 70) newTrustLevel = 'TRUSTED';
+      else if (newScore > 40) newTrustLevel = 'MEMBER';
       
       await prisma.user.update({
         where: { id: targetId },
-        data: { trustScore: newScore }
+        data: { trustScore: newScore, trustLevel: newTrustLevel }
       });
 
       // Notify target user about score change

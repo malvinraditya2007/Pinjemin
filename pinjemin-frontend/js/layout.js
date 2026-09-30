@@ -18,9 +18,9 @@ export function renderAppShell(activePage = '') {
     { href: 'discover.html',     icon: 'search',      label: 'Temukan Barang',    id: 'discover' },
     { href: 'item-new.html',     icon: 'plus-circle', label: 'Tambah Barang',     id: 'item-new' },
     { href: 'requests.html',     icon: 'send',        label: 'Permintaanku',      id: 'requests' },
-    { href: 'approvals.html',    icon: 'inbox',       label: 'Persetujuan',       id: 'approvals', badge: true },
+    { href: 'approvals.html',    icon: 'inbox',       label: 'Persetujuan',       id: 'approvals' },
     { href: 'borrows-active.html',icon:'package',     label: 'Dipinjam Aktif',    id: 'borrows-active' },
-    { href: 'notifications.html',icon: 'bell',        label: 'Notifikasi',        id: 'notifications', badge: true },
+    { href: 'notifications.html',icon: 'bell',        label: 'Notifikasi',        id: 'notifications' },
     { href: 'profile.html',      icon: 'user',        label: 'Profil Saya',       id: 'profile' },
   ];
 
@@ -102,14 +102,7 @@ export function renderAppShell(activePage = '') {
       : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary-400),var(--color-primary-600));color:white;font-weight:700;font-size:1rem">${realInitials}</div>`;
   }).catch(e => console.error(e));
 
-  // Populate notification badges
-  notifsPromise.then(notifs => {
-    const count = notifs.filter(n => !n.isRead).length;
-    document.querySelectorAll('[data-notif-badge]').forEach(el => {
-      if (count > 0) { el.textContent = count; el.style.display = ''; }
-      else el.style.display = 'none';
-    });
-  }).catch(e => console.error(e));
+  // Notification badges removed
 
   // Setup Socket.io (with limited reconnection to avoid browser freeze)
   if (!window.ioLoaded) {
@@ -125,12 +118,6 @@ export function renderAppShell(activePage = '') {
       });
       socket.on('notification', (data) => {
         toast.info(data.title, data.body);
-        // Increment badge
-        document.querySelectorAll('[data-notif-badge]').forEach(el => {
-          let count = parseInt(el.textContent) || 0;
-          el.textContent = count + 1;
-          el.style.display = '';
-        });
       });
       socket.on('connect_error', () => {
         console.warn('Socket.io connection failed, will retry up to 3 times');

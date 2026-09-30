@@ -2,8 +2,36 @@ const prisma = require('../config/prisma');
 
 exports.getMe = async (req, res, next) => {
   try {
-    const user = req.user;
-    res.json(user);
+    // Always query fresh from DB so stat fields (totalLends, totalBorrows,
+    // successfulReturns) reflect the latest increments from completed transactions.
+    // Do NOT use req.user here — it comes from auth middleware cache (30s TTL)
+    // and would return stale counters after a RETURNED/APPROVED status update.
+    const freshUser = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        username: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        avatarUrl: true,
+        bio: true,
+        address: true,
+        trustScore: true,
+        trustLevel: true,
+        totalLends: true,
+        totalBorrows: true,
+        successfulReturns: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        // passwordHash and deletedAt intentionally excluded
+      },
+    });
+
+    if (!freshUser) return res.status(404).json({ error: 'User not found' });
+
+    res.json(freshUser);
   } catch (err) {
     next(err);
   }
@@ -25,10 +53,10 @@ exports.updateMe = async (req, res, next) => {
     const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
       data: {
-        fullName,
-        bio,
-        address,
-        ...(username !== undefined && { username }),
+        ...(fullName !== undefined && { fullName }),
+        ...(bio !== undefined && { bio }),
+        ...(address !== undefined && { address }),
+        ...(username !== undefined && { username: username.toLowerCase() }),
       },
     });
 
@@ -102,9 +130,10 @@ exports.getUser = async (req, res, next) => {
         trustLevel: true,
         totalLends: true,
         totalBorrows: true,
-        neighborhood: true,
+        successfulReturns: true,
+        address: true,
         createdAt: true,
-        // Excluded: passwordHash, phone, email, address, role
+        // Excluded: passwordHash, phone, email, role
         items: {
           select: {
             id: true,
@@ -115,6 +144,8 @@ exports.getUser = async (req, res, next) => {
             isAvailable: true,
             images: true,
             neighborhood: true,
+            depositAmount: true,
+            tags: true,
             createdAt: true,
           }
         },
@@ -123,6 +154,7 @@ exports.getUser = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+
     res.json(user);
   } catch (err) {
     next(err);

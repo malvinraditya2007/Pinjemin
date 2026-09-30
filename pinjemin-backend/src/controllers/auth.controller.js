@@ -33,10 +33,6 @@ exports.register = async (req, res, next) => {
       return res.status(409).json({ success: false, message: 'Username sudah digunakan.' });
     }
 
-    // ── Build a unique phone placeholder ────────────────────
-    // phone field is @unique in the schema, so we need a value
-    const phone = `+62${Date.now()}`;
-
     // ── Hash password & create user ──────────────────────────
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
@@ -45,8 +41,7 @@ exports.register = async (req, res, next) => {
         username: username.toLowerCase(),
         fullName: nama,
         passwordHash,
-        phone,
-        role: 'user',
+        role: 'USER',
       },
     });
 
@@ -135,7 +130,6 @@ exports.getMe = async (req, res, next) => {
         totalLends: true,
         totalBorrows: true,
         successfulReturns: true,
-        neighborhood: true,
         address: true,
         role: true,
         createdAt: true,

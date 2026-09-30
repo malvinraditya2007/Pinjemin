@@ -8,14 +8,14 @@ exports.getItems = async (req, res, next) => {
     if (category) where.category = category;
     if (condition) where.condition = condition;
     if (search) {
-      where.title = { contains: search };
+      where.title = { contains: search, mode: 'insensitive' };
     }
 
     const items = await prisma.item.findMany({
       where,
       include: {
         owner: {
-          select: { id: true, fullName: true, username: true, trustScore: true, trustLevel: true, avatarUrl: true }
+          select: { id: true, fullName: true, username: true, trustScore: true, trustLevel: true, avatarUrl: true, createdAt: true }
         }
       },
       orderBy: { createdAt: 'desc' }
@@ -33,7 +33,7 @@ exports.getItem = async (req, res, next) => {
       where: { id: req.params.id },
       include: {
         owner: {
-          select: { id: true, fullName: true, username: true, trustScore: true, trustLevel: true, avatarUrl: true }
+          select: { id: true, fullName: true, username: true, trustScore: true, trustLevel: true, avatarUrl: true, createdAt: true }
         }
       }
     });
@@ -54,6 +54,18 @@ exports.createItem = async (req, res, next) => {
   try {
     const { title, description, category, condition, depositAmount, neighborhood, tags, usageGuidelines, images } = req.body;
     
+    // Parse images: frontend sends JSON.stringify([...base64]), schema expects Json (JSONB)
+    let parsedImages = [];
+    if (images) {
+      try { parsedImages = typeof images === 'string' ? JSON.parse(images) : images; }
+      catch { parsedImages = []; }
+    }
+
+    // Parse tags: frontend sends "bor, listrik, bosch", schema expects String[]
+    const parsedTags = tags
+      ? (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : tags)
+      : [];
+
     const newItem = await prisma.item.create({
       data: {
         title,
@@ -61,10 +73,10 @@ exports.createItem = async (req, res, next) => {
         category,
         condition,
         depositAmount: parseInt(depositAmount) || 0,
-        neighborhood: neighborhood || req.user.neighborhood || 'Unknown',
-        tags: tags || '',
+        neighborhood: neighborhood || req.user.address || 'Unknown',
+        tags: parsedTags,
         usageGuidelines,
-        images: images || '',
+        images: parsedImages,
         ownerId: req.user.id
       }
     });
@@ -91,9 +103,17 @@ exports.updateItem = async (req, res, next) => {
     if (condition         !== undefined) allowedData.condition         = condition;
     if (depositAmount     !== undefined) allowedData.depositAmount     = parseInt(depositAmount) || 0;
     if (neighborhood      !== undefined) allowedData.neighborhood      = neighborhood;
-    if (tags              !== undefined) allowedData.tags              = tags;
+    if (tags              !== undefined) {
+      allowedData.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : tags;
+    }
     if (usageGuidelines   !== undefined) allowedData.usageGuidelines   = usageGuidelines;
-    if (images            !== undefined) allowedData.images            = images;
+    if (images            !== undefined) {
+      if (typeof images === 'string') {
+        try { allowedData.images = JSON.parse(images); } catch { allowedData.images = []; }
+      } else {
+        allowedData.images = images;
+      }
+    }
     if (isAvailable       !== undefined) allowedData.isAvailable       = Boolean(isAvailable);
 
     const updated = await prisma.item.update({

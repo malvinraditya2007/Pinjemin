@@ -115,7 +115,7 @@ async function init() {
       <span style="color:var(--color-neutral-700)">${item.title}</span>`;
       
     let images = [];
-    try { images = JSON.parse(item.images || '[]'); } catch(e) { images = []; }
+    images = Array.isArray(item.images) ? item.images : (() => { try { return JSON.parse(item.images || '[]'); } catch(e) { return []; } })();
     const mainImgHTML = images.length
       ? `<img src="${images[0]}" id="gallery-main-img" style="width:100%;height:100%;object-fit:cover" alt="${item.title}"/>`
       : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--color-primary-50),var(--color-primary-100));font-size:6rem">${cat.emoji}</div>`;
@@ -195,7 +195,7 @@ async function init() {
       <h2 class="text-heading-xl" style="margin-bottom:var(--space-4)">Deskripsi</h2>
       <p style="color:var(--color-neutral-600);line-height:1.7">${item.description}</p>
       <div style="margin-top:var(--space-4);display:flex;gap:var(--space-2);flex-wrap:wrap">
-        ${(item.tags || '').split(',').map(t => `<span class="tag-chip">#${t}</span>`).join('')}
+        ${(Array.isArray(item.tags) ? item.tags : typeof item.tags === 'string' ? item.tags.split(',') : []).map(t => `<span class="tag-chip">#${t.trim()}</span>`).join('')}
       </div>
     </div>
 
@@ -214,10 +214,9 @@ async function init() {
     
     document.getElementById('similar-grid').innerHTML = similar.map(si => {
       const sc = getCategoryInfo(si.category);
-      let images = [];
-      try { images = JSON.parse(si.images || '[]'); } catch(e) { images = []; }
-      const imgHTML = images.length
-        ? `<img src="${images[0]}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;" alt="${si.title}"/>`
+      const imgArr = Array.isArray(si.images) ? si.images : (() => { try { return JSON.parse(si.images || '[]'); } catch(e) { return []; } })();
+      const imgHTML = imgArr.length
+        ? `<img src="${imgArr[0]}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;" alt="${si.title}"/>`
         : `<div class="item-card__placeholder"><span>${sc.emoji}</span></div>`;
 
       return `<a href="item-detail.html?id=${si.id}" class="item-card">

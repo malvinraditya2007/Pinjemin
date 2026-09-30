@@ -61,7 +61,7 @@ exports.createRequest = async (req, res, next) => {
         title: 'Ada yang mau meminjam! 📦',
         body: `${req.user.fullName} ingin meminjam ${item.title}.`,
         userId: item.ownerId,
-        data: JSON.stringify({ requestId: newReq.id })
+        data: { requestId: newReq.id }
       }
     });
 
@@ -105,10 +105,30 @@ exports.updateStatus = async (req, res, next) => {
       }
     });
 
-    // Side effects (Item availability)
+    // Side effects (Item availability + user stat counters)
     if (status === 'APPROVED') {
       await prisma.item.update({ where: { id: request.itemId }, data: { isAvailable: false } });
-    } else if (status === 'RETURNED' || status === 'CANCELLED' || status === 'REJECTED') {
+      await Promise.all([
+        prisma.user.update({ where: { id: request.lenderId },   data: { totalLends: { increment: 1 } } }),
+        prisma.user.update({ where: { id: request.borrowerId }, data: { totalBorrows: { increment: 1 } } }),
+      ]);
+      if (global.__authUserCache) {
+        global.__authUserCache.delete(request.lenderId);
+        global.__authUserCache.delete(request.borrowerId);
+      }
+    } else if (status === 'RETURNED') {
+      await prisma.item.update({ where: { id: request.itemId }, data: { isAvailable: true } });
+      // Increment return counters for leaderboard and profile stats
+      await Promise.all([
+        prisma.user.update({ where: { id: request.lenderId },   data: { successfulReturns: { increment: 1 } } }),
+        prisma.user.update({ where: { id: request.borrowerId }, data: { successfulReturns: { increment: 1 } } }),
+      ]);
+      // Bust auth cache so the next GET /users/me returns fresh counters
+      if (global.__authUserCache) {
+        global.__authUserCache.delete(request.lenderId);
+        global.__authUserCache.delete(request.borrowerId);
+      }
+    } else if (status === 'CANCELLED' || status === 'REJECTED') {
       await prisma.item.update({ where: { id: request.itemId }, data: { isAvailable: true } });
     }
 
@@ -134,7 +154,7 @@ exports.updateStatus = async (req, res, next) => {
 
     if (targetUserId) {
       const notif = await prisma.notification.create({
-        data: { type: notifType, title: notifTitle, body: notifBody, userId: targetUserId, data: JSON.stringify({ requestId: request.id }) }
+        data: { type: notifType, title: notifTitle, body: notifBody, userId: targetUserId, data: { requestId: request.id } }
       });
       try {
         getIo().to(targetUserId).emit('notification', notif);

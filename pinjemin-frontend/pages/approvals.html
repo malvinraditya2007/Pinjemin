@@ -62,7 +62,6 @@
     async function loadApprovals() {
       try {
         approvals = await api.requests.getReceived();
-        document.getElementById('pending-badge').textContent = approvals.filter(r => r.status === 'PENDING').length;
         render();
       } catch (e) {
         console.error('Failed to load approvals', e);

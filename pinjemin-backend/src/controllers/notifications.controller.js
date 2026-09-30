@@ -7,13 +7,7 @@ exports.getNotifications = async (req, res, next) => {
       orderBy: { createdAt: 'desc' }
     });
     
-    // Parse JSON data fields
-    const parsed = notifications.map(n => ({
-      ...n,
-      data: n.data ? JSON.parse(n.data) : null
-    }));
-
-    res.json(parsed);
+    res.json(notifications);
   } catch (err) {
     next(err);
   }

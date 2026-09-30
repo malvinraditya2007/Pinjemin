@@ -184,7 +184,7 @@ async function init() {
       <div class="grid grid-cols-3 grid-gap-6">${myItems.map(item => {
         const cat = getCategoryInfo(item.category);
         let images = [];
-        try { images = JSON.parse(item.images || '[]'); } catch(e) { images = []; }
+        images = Array.isArray(item.images) ? item.images : (() => { try { return JSON.parse(item.images || '[]'); } catch(e) { return []; } })();
         const imgHTML = images.length
           ? `<img src="${images[0]}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;" alt="${item.title}"/>`
           : `<div class="item-card__placeholder"><span>${cat.emoji}</span></div>`;

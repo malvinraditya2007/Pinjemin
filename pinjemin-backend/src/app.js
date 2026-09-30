@@ -16,15 +16,20 @@ const notificationsRoutes = require('./routes/notifications.routes');
 const app = express();
 
 // Middleware
-// Restrict CORS to frontend origin — set FRONTEND_URL in .env for production
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5500')
-  .split(',').map(o => o.trim());
+// In dev, allow ANY localhost port (Live Server uses 5500/5501/5503, etc.)
+// In production, lock to FRONTEND_URL env var (e.g. https://pinjemin.com)
+const isDev = process.env.NODE_ENV !== 'production';
+const allowedOrigins = (process.env.FRONTEND_URL || '')
+  .split(',').map(o => o.trim()).filter(Boolean);
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. mobile apps, curl, Postman in dev)
-    if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+    // Allow requests with no origin (curl, Postman, mobile apps)
+    if (!origin) return callback(null, true);
+    // In dev: allow any localhost or 127.0.0.1 regardless of port
+    if (isDev && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return callback(null, true);
+    // In prod (or if FRONTEND_URL set): check explicit allowlist
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`CORS: origin '${origin}' not allowed`));
   },
   credentials: true,

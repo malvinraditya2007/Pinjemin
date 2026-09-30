@@ -1,8 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
+const SEED_PASSWORD = 'pinjemin123'; // All seed users share this password
 
 async function main() {
-  // Clear existing data
+  // Clear existing data (order respects FK constraints)
   await prisma.notification.deleteMany();
   await prisma.review.deleteMany();
   await prisma.request.deleteMany();
@@ -11,21 +13,26 @@ async function main() {
 
   console.log('Seeding database...');
 
-  // Create Users
+  // Hash the shared seed password once
+  const passwordHash = await bcrypt.hash(SEED_PASSWORD, 10);
+
+  // ── Users ──────────────────────────────────────────────────────────
+  // Schema changes: neighborhood dropped from User (use address instead)
   const user1 = await prisma.user.create({
     data: {
       id: 'user-001',
       username: 'budi_santoso',
       fullName: 'Budi Santoso',
       phone: '+62811234567',
+      passwordHash,
       bio: 'Senang berbagi dan membantu komunitas sekitar. Mari jaga lingkungan bersama! 🌱',
       trustScore: 87,
       trustLevel: 'TRUSTED',
       totalLends: 24,
       totalBorrows: 18,
       successfulReturns: 17,
-      neighborhood: 'Menteng',
       address: 'Menteng, Jakarta Pusat',
+      role: 'USER',
     }
   });
 
@@ -35,9 +42,14 @@ async function main() {
       username: 'andi_p',
       fullName: 'Andi Pratama',
       phone: '+62822345678',
+      passwordHash,
       trustScore: 92,
       trustLevel: 'VERIFIED',
-      neighborhood: 'Gondangdia',
+      totalLends: 31,
+      totalBorrows: 5,
+      successfulReturns: 28,
+      address: 'Gondangdia, Jakarta Pusat',
+      role: 'USER',
     }
   });
 
@@ -47,9 +59,14 @@ async function main() {
       username: 'sari_d',
       fullName: 'Sari Dewi',
       phone: '+62833456789',
+      passwordHash,
       trustScore: 78,
       trustLevel: 'TRUSTED',
-      neighborhood: 'Cikini',
+      totalLends: 12,
+      totalBorrows: 9,
+      successfulReturns: 9,
+      address: 'Cikini, Jakarta Pusat',
+      role: 'USER',
     }
   });
 
@@ -59,13 +76,15 @@ async function main() {
       username: 'fajar_n',
       fullName: 'Fajar Nugroho',
       phone: '+62855678901',
+      passwordHash,
       trustScore: 55,
       trustLevel: 'MEMBER',
-      neighborhood: 'Pegangsaan',
+      address: 'Pegangsaan, Jakarta Pusat',
+      role: 'USER',
     }
   });
 
-  // Create Items
+  // ── Items ──────────────────────────────────────────────────────────
   const item1 = await prisma.item.create({
     data: {
       id: 'item-001',
@@ -73,13 +92,12 @@ async function main() {
       description: 'Mesin bor listrik Bosch serbaguna, cocok untuk kayu dan tembok ringan. Dilengkapi mata bor berbagai ukuran.',
       category: 'TOOLS',
       condition: 'EXCELLENT',
-      images: '',
+      images: [],
       depositAmount: 50000,
       isAvailable: true,
       viewCount: 124,
       neighborhood: 'Menteng',
-      distance: 1.2,
-      tags: 'bor,listrik,bosch',
+      tags: ['bor', 'listrik', 'bosch'],
       usageGuidelines: 'Harap kembalikan dalam kondisi bersih. Jangan gunakan untuk material yang terlalu keras.',
       ownerId: user2.id,
     }
@@ -92,13 +110,12 @@ async function main() {
       description: 'Tenda kapasitas 4 orang, waterproof, mudah dipasang. Cocok untuk camping weekend.',
       category: 'OUTDOOR',
       condition: 'GOOD',
-      images: '',
+      images: [],
       depositAmount: 100000,
       isAvailable: true,
       viewCount: 89,
       neighborhood: 'Gondangdia',
-      distance: 2.5,
-      tags: 'camping,tenda,outdoor',
+      tags: ['camping', 'tenda', 'outdoor'],
       usageGuidelines: 'Keringkan sebelum dikembalikan. Cek tiang dan pasak lengkap.',
       ownerId: user3.id,
     }
@@ -111,19 +128,18 @@ async function main() {
       description: 'Proyektor portabel 3600 lumen. Cocok untuk presentasi dan nonton bareng.',
       category: 'ELECTRONICS',
       condition: 'EXCELLENT',
-      images: '',
+      images: [],
       depositAmount: 200000,
       isAvailable: false,
       viewCount: 210,
       neighborhood: 'Menteng',
-      distance: 0.8,
-      tags: 'proyektor,presentasi,epson',
+      tags: ['proyektor', 'presentasi', 'epson'],
       usageGuidelines: 'Handle with care. Jangan sentuh lensa. Kembalikan dengan kabel lengkap.',
       ownerId: user1.id,
     }
   });
 
-  // Create Requests
+  // ── Requests ───────────────────────────────────────────────────────
   const req1 = await prisma.request.create({
     data: {
       id: 'req-001',
@@ -165,7 +181,8 @@ async function main() {
     }
   });
 
-  // Create Notifications
+  // ── Notifications ──────────────────────────────────────────────────
+  // Schema change: data is now native Json — pass plain objects, NOT JSON.stringify
   await prisma.notification.create({
     data: {
       type: 'BORROW_REQUEST_RECEIVED',
@@ -173,7 +190,7 @@ async function main() {
       body: 'Fajar Nugroho ingin meminjam Proyektor Epson EB-X41 dari 13 Mei – 13 Mei.',
       isRead: false,
       userId: user1.id,
-      data: JSON.stringify({ requestId: req3.id }),
+      data: { requestId: req3.id },
     }
   });
 
@@ -184,16 +201,29 @@ async function main() {
       body: 'Andi Pratama menyetujui peminjaman Mesin Bor Bosch GSB 550.',
       isRead: false,
       userId: user1.id,
-      data: JSON.stringify({ requestId: req1.id }),
+      data: { requestId: req1.id },
     }
   });
 
-  console.log('Seeding completed successfully!');
+  await prisma.notification.create({
+    data: {
+      type: 'WELCOME',
+      title: 'Selamat datang di Pinjemin! 👋',
+      body: 'Temukan dan pinjam barang dari tetanggamu. Mulai dengan menelusuri barang tersedia.',
+      isRead: true,
+      userId: user1.id,
+    }
+  });
+
+  console.log('✅ Seeding completed successfully!');
+  console.log(`   Users: 4 | Items: 3 | Requests: 3 | Notifications: 3`);
+  console.log(`\n🔑 Login credentials for all seed users: password = "${SEED_PASSWORD}"`);
+  console.log(`   budi_santoso | andi_p | sari_d | fajar_n`);
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {

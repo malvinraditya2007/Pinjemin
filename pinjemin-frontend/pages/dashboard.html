@@ -45,12 +45,12 @@
           <div class="stats-row reveal" style="margin-bottom:var(--space-8)">
             <div class="stat-card stat-card--blue">
               <div class="stat-card__label">Dipinjam Aktif</div>
-              <div class="stat-card__value">1</div>
+              <div class="stat-card__value" id="active-borrows-count">0</div>
               <div class="stat-card__sub">berjalan lancar</div>
             </div>
             <div class="stat-card stat-card--orange">
               <div class="stat-card__label">Perlu Persetujuan</div>
-              <div class="stat-card__value" id="approval-count">1</div>
+              <div class="stat-card__value" id="approval-count">0</div>
               <div class="stat-card__sub">menunggu responsmu</div>
             </div>
             <div class="stat-card stat-card--green">
@@ -153,17 +153,19 @@
       const appData = window._appData || {};
       
       // Fire all API calls in parallel for ~1s total load time
-      const [userResult, itemsResult, notifsResult, topLendersResult, impactResult] = await Promise.allSettled([
+      const [userResult, itemsResult, notifsResult, topLendersResult, impactResult, sentReqsResult, rcvReqsResult] = await Promise.allSettled([
         appData.userPromise || api.users.getMe(),
         api.items.getAll(),
         appData.notifsPromise || api.notifications.getAll(),
         api.users.getTopLenders(),
-        api.users.getImpact()
+        api.users.getImpact(),
+        api.requests.getSent(),
+        api.requests.getReceived()
       ]);
 
       // Handle user data
       if (userResult.status === 'fulfilled') {
-        const user = userResult.value;
+        user = userResult.value;
         document.getElementById('greeting-text').textContent = `Halo, ${user.fullName.split(' ')[0]}! 👋`;
         document.getElementById('greeting-loc').textContent = user.address || 'Indonesia';
         document.getElementById('trust-score-val').textContent = user.trustScore;
@@ -229,6 +231,18 @@
         `;
       }
 
+      if (sentReqsResult.status === 'fulfilled') {
+        const activeCount = sentReqsResult.value.filter(r => r.status === 'APPROVED').length;
+        const el = document.getElementById('active-borrows-count');
+        if (el) el.textContent = activeCount;
+      }
+      
+      if (rcvReqsResult.status === 'fulfilled') {
+        const pendingCount = rcvReqsResult.value.filter(r => r.status === 'PENDING').length;
+        const el = document.getElementById('approval-count');
+        if (el) el.textContent = pendingCount;
+      }
+
       // Always animate elements into view
       revealElements();
     }
@@ -238,7 +252,7 @@
       const cat = getCategoryInfo(item.category);
       const initials = getInitials(item.owner.fullName);
       let images = [];
-      try { images = JSON.parse(item.images || '[]'); } catch(e) { images = []; }
+      images = Array.isArray(item.images) ? item.images : (() => { try { return JSON.parse(item.images || '[]'); } catch(e) { return []; } })();
 
       const imageHtml = images.length > 0 
         ? `<img src="${images[0]}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:1;" alt="${item.title}">`
@@ -285,7 +299,7 @@
 
     let activeFilter = '';
     function renderGrid(filter) {
-      const filtered = filter ? itemsData.filter(i => i.category === filter) : itemsData;
+      const filtered = itemsData.filter(i => i.isAvailable && (!user || i.owner.id !== user.id) && (!filter || i.category === filter));
       document.getElementById('items-grid').innerHTML = filtered.map(renderItemCard).join('');
       lucide.createIcons();
     }
