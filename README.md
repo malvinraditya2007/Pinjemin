@@ -86,7 +86,7 @@ npm run dev
 Server akan berjalan di `http://localhost:3000`.
 
 ### 2. Menjalankan Frontend
-Karena *frontend* menggunakan Vanilla JS / HTML murni, Anda cukup menggunakan ekstensi **Live Server** (di VS Code) pada folder `pinjemin-frontend/` dan membukanya di `http://127.0.0.1:5500`.
+Karena *frontend* menggunakan Vanilla JS / HTML murni, Anda cukup menggunakan ekstensi **Live Server** (di VS Code) pada folder `pinjemin-frontend/` dan membukanya di `http://127.0.0.1:5503`.
 
 *Catatan: Pastikan `FRONTEND_URL` di `.env` disetel sesuai dengan port Live Server Anda agar konfigurasi CORS backend berjalan dengan benar.*
 

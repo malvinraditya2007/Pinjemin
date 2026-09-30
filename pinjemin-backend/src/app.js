@@ -64,7 +64,7 @@ app.use('/v1/ratings', ratingsRoutes);
 app.use('/v1/notifications', notificationsRoutes);
 
 // Health check & Root
-app.get('/', (req, res) => res.send('🚀 Pinjemin Backend API is running! Access the frontend at http://localhost:5500'));
+app.get('/', (req, res) => res.send('🚀 Pinjemin Backend API is running! Access the frontend at http://localhost:5503'));
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
 // Error handling
