@@ -6,6 +6,7 @@ import api, { CURRENT_USER_ID } from './api.js';
 import { getTrustLevel, getInitials } from './utils.js';
 import toast from './toast.js';
 import { logout } from './auth.js';
+import { SOCKET_URL } from './config.js';
 
 export function renderAppShell(activePage = '') {
   // Render placeholder first
@@ -110,7 +111,7 @@ export function renderAppShell(activePage = '') {
     const script = document.createElement('script');
     script.src = 'https://cdn.socket.io/4.7.5/socket.io.min.js';
     script.onload = () => {
-      const socket = io('http://localhost:3000', {
+      const socket = io(SOCKET_URL, {
         extraHeaders: { 'x-user-id': CURRENT_USER_ID },
         reconnectionAttempts: 3,
         reconnectionDelay: 5000,

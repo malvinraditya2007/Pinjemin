@@ -1,6 +1,16 @@
 /** PINJEMIN — CONFIG */
-export const API_BASE_URL = 'http://localhost:3000/v1';
-export const SOCKET_URL   = 'http://localhost:3000';
+
+// ── Environment-aware backend URL ────────────────────────────────────
+// When the site runs on localhost/127.0.0.1 we talk to the local backend.
+// Anywhere else (e.g. the Vercel deployment) we talk to the Render backend.
+// Replace the production URL below with your real Render URL once deployed.
+const IS_LOCAL = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const PROD_API_ORIGIN = 'https://pinjemin-production-backend.up.railway.app';
+
+const API_ORIGIN = IS_LOCAL ? 'http://localhost:3000' : PROD_API_ORIGIN;
+
+export const API_BASE_URL = `${API_ORIGIN}/v1`;
+export const SOCKET_URL   = API_ORIGIN;
 export const APP_NAME     = 'Pinjemin';
 
 export const CATEGORIES = [

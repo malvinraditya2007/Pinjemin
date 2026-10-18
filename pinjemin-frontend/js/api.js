@@ -1,5 +1,5 @@
-// Configuration
-const BASE_URL = 'http://localhost:3000/v1';
+// Configuration — single source of truth lives in config.js (env-aware)
+import { API_BASE_URL as BASE_URL } from './config.js';
 
 // Prefer the logged-in user's ID from localStorage (set after JWT login).
 // Fall back to the seed user for backward-compatible local dev.

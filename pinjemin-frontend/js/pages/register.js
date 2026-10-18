@@ -1,6 +1,5 @@
 import { isLoggedIn } from '../auth.js';
-
-const API_BASE = 'http://localhost:3000/v1';
+import { API_BASE_URL as API_BASE } from '../config.js';
 
 // If already logged in, skip register page
 if (isLoggedIn()) {
