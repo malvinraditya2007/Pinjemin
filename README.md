@@ -18,7 +18,7 @@
 | **Frontend** | HTML5 Semantik, CSS3 (Vanilla CSS), JavaScript (Vanilla JS), Leaflet.js |
 | **Backend** | Node.js, Express.js |
 | **Database** | PostgreSQL (di-hosting via NeonDB), Prisma ORM |
-| **Keamanan & Auth** | JSON Web Token (JWT), `bcrypt`, `dotenv` untuk isolasi rahasia |
+| **Keamanan & Auth** | JSON Web Token (JWT), `bcrypt`, Native Environment Loader untuk isolasi rahasia |
 
 ## Struktur Direktori
 
