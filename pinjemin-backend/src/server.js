@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('./config/env');
 
 // ── Fail-Fast Env Validation ─────────────────────────────────────────
 const requiredEnvs = ['DATABASE_URL', 'JWT_SECRET'];
@@ -20,8 +20,8 @@ const server = http.createServer(app);
 initSocket(server);
 
 // ── Graceful Shutdown ────────────────────────────────────────────────
-// Properly releases the port on SIGINT (Ctrl+C) and SIGTERM (nodemon restart).
-// Without this, nodemon hot-reloads can leave the port in TIME_WAIT and cause
+// Properly releases the port on SIGINT (Ctrl+C) and SIGTERM (watch reload).
+// Without this, hot-reloads can leave the port in TIME_WAIT and cause
 // EADDRINUSE on the next start.
 function gracefulShutdown(signal) {
   console.log(`\n[${signal}] Shutting down gracefully...`);
