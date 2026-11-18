@@ -70,6 +70,17 @@ export function getStatusBadge(status) {
   return map[status] || { label: status, class: '' };
 }
 
+/** Display legacy rejection codes and saved rejection explanations. */
+export function formatRejectReason(reason) {
+  const labels = new Map([
+    ['dates', 'Tanggal tidak tersedia'],
+    ['profile', 'Profil belum lengkap'],
+    ['trust', 'Trust score terlalu rendah'],
+    ['other', 'Lainnya'],
+  ]);
+  return labels.get(reason) || reason || '';
+}
+
 /** Get item condition label */
 export function getConditionLabel(condition) {
   const map = {

@@ -1,7 +1,7 @@
 import { renderAppShell } from '../layout.js';
 import { requireLogin } from '../auth.js';
 import api from '../api.js';
-import { formatDateRange, formatRelativeTime, getStatusBadge, getCategoryInfo, getInitials } from '../utils.js';
+import { formatDateRange, formatRelativeTime, getStatusBadge, getCategoryInfo, getInitials, formatRejectReason, escapeHTML } from '../utils.js';
 import toast from '../toast.js';
 
 requireLogin();
@@ -49,6 +49,13 @@ function render() {
           &nbsp;·&nbsp; Diajukan ${formatRelativeTime(req.createdAt)}
         </div>
         <div class="request-card__purpose">"${req.purpose}"</div>
+        ${req.status === 'REJECTED' && req.rejectReason ? `
+        <div class="info-card" style="margin-bottom:var(--space-3)">
+          <div class="info-card__content">
+            <div class="info-card__title">Alasan penolakan</div>
+            <div class="info-card__text" style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(formatRejectReason(req.rejectReason))}</div>
+          </div>
+        </div>` : ''}
         <a href="item-detail.html?id=${req.item.id}" class="request-card__item-thumb">
           <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--color-primary-100);display:flex;align-items:center;justify-content:center;font-size:1.5rem">${cat.emoji}</div>
           <span class="request-card__item-name">${req.item.title}</span>

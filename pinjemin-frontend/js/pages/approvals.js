@@ -1,7 +1,7 @@
 import { renderAppShell } from '../layout.js';
 import { requireLogin } from '../auth.js';
 import api from '../api.js';
-import { formatDateRange, formatRelativeTime, getStatusBadge, getCategoryInfo, getTrustLevel, getInitials } from '../utils.js';
+import { formatDateRange, formatRelativeTime, getStatusBadge, getCategoryInfo, getTrustLevel, getInitials, formatRejectReason, escapeHTML } from '../utils.js';
 import toast from '../toast.js';
 
 requireLogin();
@@ -58,6 +58,13 @@ function render() {
           </div>
         </div>
         ${req.message ? `<div style="font-size:var(--text-body-sm-size);color:var(--color-neutral-500);font-style:italic;margin-bottom:var(--space-4)">"${req.message}"</div>` : ''}
+        ${req.status === 'REJECTED' && req.rejectReason ? `
+        <div class="info-card" style="margin-bottom:var(--space-4)">
+          <div class="info-card__content">
+            <div class="info-card__title">Alasan penolakan</div>
+            <div class="info-card__text" style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(formatRejectReason(req.rejectReason))}</div>
+          </div>
+        </div>` : ''}
 
         <a href="item-detail.html?id=${req.item.id}" class="request-card__item-thumb" style="text-decoration:none">
           <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--color-primary-100);display:flex;align-items:center;justify-content:center;font-size:1.5rem">${cat.emoji}</div>
@@ -122,8 +129,12 @@ async function rejectReq(id) {
   const reason = reasonEl ? reasonEl.value : '';
   if (!reason) { toast.error('Pilih alasan', 'Silakan pilih alasan penolakan.'); return; }
 
+  const message = document.getElementById(`reject-msg-${id}`)?.value.trim() || '';
+  const reasonLabel = formatRejectReason(reason);
+  const rejectReason = message ? `${reasonLabel}\n${message}` : reasonLabel;
+
   try {
-    await api.requests.updateStatus(id, 'REJECTED', reason);
+    await api.requests.updateStatus(id, 'REJECTED', rejectReason);
     toast.warning('Permintaan ditolak', 'Peminjam akan mendapat notifikasi.');
     loadApprovals();
   } catch (e) {
